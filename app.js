@@ -70,7 +70,20 @@ async function writeUploadedFile(pyodide, inputFile, destPath) {
   return destPath;
 }
 
-async function runComparison() {
+// Helper: fetch an existing file from the server (e.g. data/ folder)
+// and write it into Pyodide FS at destPath
+async function writeServerFile(pyodide, url, destPath) {
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch ${url}: ${resp.status} ${resp.statusText}`);
+  }
+  const buf = await resp.arrayBuffer();
+  const data = new Uint8Array(buf);
+  pyodide.FS.writeFile(destPath, data);
+  return destPath;
+}
+
+async function runInputPlot() {
   // clear old logs and hide old plots
   outputEl.textContent = "";
   const initialBlock = document.getElementById("initial-block");
@@ -83,13 +96,11 @@ async function runComparison() {
   const paths    = document.getElementById("paths").files[0];
   const initial  = document.getElementById("initial").files[0];
   const graphbin = document.getElementById("graphbin").files[0];
-  const setPrefix   = document.getElementById("setting-prefix").value;
   const setDpi      = parseInt(document.getElementById("setting-dpi").value);
   const setWidth    = parseInt(document.getElementById("setting-width").value);
   const setHeight   = parseInt(document.getElementById("setting-height").value);
   const setVsize    = parseInt(document.getElementById("setting-vsize").value);
   const setLsize    = parseInt(document.getElementById("setting-lsize").value);
-  const setMargin   = parseInt(document.getElementById("setting-margin").value);
   const setImgtype  = document.getElementById("setting-imgtype").value;
   const setDelimiter= document.getElementById("setting-delimiter").value;
 
@@ -117,13 +128,13 @@ async function runComparison() {
     graph: graphPath,
     paths: pathsPath,
     output: "/out/",
-    prefix: setPrefix,
+    prefix: "",
     dpi: setDpi,
     width: setWidth,
     height: setHeight,
     vsize: setVsize,
     lsize: setLsize,
-    margin: setMargin,
+    margin: 10,
     imgtype: setImgtype,
     delimiter: setDelimiter,
   };
@@ -184,12 +195,122 @@ spades_plot.run(args_ns)
   log("Done!");
 }
 
+async function runExamplePlot() {
+  // clear old logs and hide old plots
+  outputEl.textContent = "";
+  const initialBlock = document.getElementById("initial-block");
+  const finalBlock = document.getElementById("final-block");
+  if (initialBlock) initialBlock.style.display = "none";
+  if (finalBlock) finalBlock.style.display = "none";
+
+  // Read settings (same as runInputPlot)
+  const setDpi       = parseInt(document.getElementById("setting-dpi").value);
+  const setWidth     = parseInt(document.getElementById("setting-width").value);
+  const setHeight    = parseInt(document.getElementById("setting-height").value);
+  const setVsize     = parseInt(document.getElementById("setting-vsize").value);
+  const setLsize     = parseInt(document.getElementById("setting-lsize").value);
+  const setImgtype   = document.getElementById("setting-imgtype").value;
+  const setDelimiter = document.getElementById("setting-delimiter").value;
+
+  const pyodide = await getPyodide();
+
+  log("Loading example data files into Pyodide FS...");
+
+  // ⚠️ Adjust these URLs to match your real test data filenames
+  const graphPath   = await writeServerFile(pyodide, "data/assembly_graph_with_scaffolds.gfa", "/data/assembly_graph.gfa");
+  const contigsPath = await writeServerFile(pyodide, "data/contigs.fasta",       "/data/contigs.fasta");
+  const pathsPath   = await writeServerFile(pyodide, "data/contigs.paths",       "/data/contigs.paths");
+  const initialPath = await writeServerFile(pyodide, "data/initial_binning_res.csv", "/data/initial_binning.csv");
+  const finalPath   = await writeServerFile(pyodide, "data/graphbin_res.csv","/data/final_binning.csv");
+
+  // Build args dict for the Python script (paths into Pyodide FS)
+  const args = {
+    initial: initialPath,
+    final: finalPath,
+    graph: graphPath,
+    paths: pathsPath,
+    output: "/out/",
+    prefix: "",
+    dpi: setDpi,
+    width: setWidth,
+    height: setHeight,
+    vsize: setVsize,
+    lsize: setLsize,
+    margin: 10,
+    imgtype: setImgtype,
+    delimiter: setDelimiter,
+  };
+
+  log("Running GraphBin visualise on example data in Pyodide...");
+
+  await pyodide.runPythonAsync(`
+import json
+from types import SimpleNamespace
+import spades_plot
+
+args_dict = json.loads(${JSON.stringify(JSON.stringify(args))})
+args_ns = SimpleNamespace(**args_dict)
+
+spades_plot.run(args_ns)
+  `);
+
+  log("Python finished, reading example plots from /out...");
+
+  // List files in /out
+  const files = pyodide.FS.readdir("/out").filter((f) => f.endsWith(".png"));
+  log("Output files: " + files.join(", "));
+
+  const initialFile = files.find((f) => f.includes("initial_binning_result"));
+  const finalFile   = files.find((f) => f.includes("final_GraphBin_binning_result"));
+
+  function fileToImgSrc(path) {
+    const data = pyodide.FS.readFile(path); // Uint8Array
+    const blob = new Blob([data], { type: "image/png" });
+    return URL.createObjectURL(blob);
+  }
+
+  // if you’re tracking paths for download, keep your variables here:
+  lastInitialImgPath = null;
+  lastFinalImgPath = null;
+
+  if (initialFile) {
+    const fullPath = "/out/" + initialFile;
+    const src = fileToImgSrc(fullPath);
+    document.getElementById("initial-img").src = src;
+    if (initialBlock) initialBlock.style.display = "flex";
+    lastInitialImgPath = fullPath;
+  } else {
+    log("Initial plot not found in /out.");
+  }
+
+  if (finalFile) {
+    const fullPath = "/out/" + finalFile;
+    const src = fileToImgSrc(fullPath);
+    document.getElementById("final-img").src = src;
+    if (finalBlock) finalBlock.style.display = "flex";
+    lastFinalImgPath = fullPath;
+  } else {
+    log("Final plot not found in /out.");
+  }
+
+  log("Done (example data)!");
+}
+
+
 document.getElementById("run-btn").addEventListener("click", () => {
-  runComparison().catch((err) => {
+  runInputPlot().catch((err) => {
     console.error(err);
     log("Error: " + err);
   });
 });
+
+document.getElementById("example-btn").addEventListener("click", () => {
+  runExamplePlot().catch((err) => {
+    console.error(err);
+    log("Error (example): " + err);
+  });
+});
+
 
 document.getElementById("download-initial").addEventListener("click", () => {
   downloadImage("initial").catch(err => {

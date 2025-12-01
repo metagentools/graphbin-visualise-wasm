@@ -4,111 +4,141 @@
   <meta charset="UTF-8" />
   <title>GraphBin Visualise Wasm App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>GraphBin Visualise Wasm App</h1>
+  <div class="app">
+    <header class="app-header">
+      <h1>GraphBin Visualise Wasm App</h1>
+      <p class="subtitle">
+        Visualise and compare metagenomic binning results and improved binning results from GraphBin directly in your browser.
+      </p>
+    </header>
 
-  <h2>Input files</h2>
-  <div>
-    <label><strong>GFA file: </strong> <input id="graph" type="file"></label>
-  </div>
-  <div>
-    <label><strong>Contigs file: </strong> <input id="contigs" type="file"></label>
-  </div>
-  <div>
-    <label><strong>Paths file: </strong> <input id="paths" type="file"></label>
-  </div>
-  <div>
-    <label><strong>Initial binning result: </strong> <input id="initial" type="file"></label>
-  </div>
-  <div>
-    <label><strong>GraphBin result: </strong> <input id="graphbin" type="file"></label>
-  </div>
+    <!-- Configuration panel -->
+    <section class="panel">
+        You can load your own data and click <b>Plot binning results</b>, or click <b>Run example data</b> to see how it works on the example data provided.
+          <h3>Input Files</h3>
+      <div id="config-two-col">
+        <!-- Column 1: Input files -->
+        <div id="input-files-col">
 
-  <div id="settings-panel">
-  <h2>Plot Settings</h2>
+          <div class="setting-item">
+            <label for="assembler"><strong>Assembler:</strong></label>
+            <select id="assembler">
+              <option value="spades" selected>SPAdes</option>
+            </select>
+          </div>
 
-  <div class="setting-item">
-    <label for="setting-prefix"><strong>Prefix: </strong></label>
-    <input type="text" id="setting-prefix" value="">
-  </div>
+          <div class="config-item">
+            <label><strong>GFA file:</strong></label>
+            <input id="graph" type="file">
+          </div>
 
-  <div class="setting-item">
-    <label for="setting-dpi"><strong>DPI: </strong></label>
-    <input type="number" id="setting-dpi" value="300">
-  </div>
+          <div class="config-item">
+            <label><strong>Contigs file:</strong></label>
+            <input id="contigs" type="file">
+          </div>
 
-  <div class="setting-item">
-    <label for="setting-width"><strong>Width (px): </strong></label>
-    <input type="number" id="setting-width" value="2000">
-  </div>
+          <div class="config-item">
+            <label><strong>Paths file:</strong></label>
+            <input id="paths" type="file">
+          </div>
 
-  <div class="setting-item">
-    <label for="setting-height"><strong>Height (px): </strong></label>
-    <input type="number" id="setting-height" value="2000">
-  </div>
+          <div class="config-item">
+            <label><strong>Initial binning result:</strong></label>
+            <input id="initial" type="file">
+          </div>
 
-  <div class="setting-item">
-    <label for="setting-vsize"><strong>Vertex Size: </strong></label>
-    <input type="number" id="setting-vsize" value="50">
-  </div>
+          <div class="config-item">
+            <label><strong>GraphBin result:</strong></label>
+            <input id="graphbin" type="file">
+          </div>
+        </div>
 
-  <div class="setting-item">
-    <label for="setting-lsize"><strong>Label Size: </strong></label>
-    <input type="number" id="setting-lsize" value="2">
-  </div>
+        <!-- Column 2: Plot settings -->
+        <div id="settings-panel">
+          <h3>Plot Settings</h3>
 
-  <div class="setting-item">
-    <label for="setting-margin"><strong>Margin: </strong></label>
-    <input type="number" id="setting-margin" value="10">
-  </div>
+          <div class="setting-item">
+            <label for="setting-dpi"><strong>DPI:</strong></label>
+            <input type="number" id="setting-dpi" value="300">
+          </div>
 
-  <div class="setting-item">
-    <label for="setting-imgtype"><strong>Image Type: </strong></label>
-    <select id="setting-imgtype">
-      <option value="png" selected>PNG</option>
-      <option value="svg">SVG</option>
-      <option value="pdf">PDF</option>
-    </select>
-  </div>
+          <div class="setting-item">
+            <label for="setting-width"><strong>Width (px):</strong></label>
+            <input type="number" id="setting-width" value="2000">
+          </div>
 
-  <div class="setting-item">
-    <label for="setting-delimiter"><strong>Delimiter: </strong></label>
-    <select id="setting-delimiter">
-      <option value="," selected>Comma (,)</option>
-      <option value="\t">Tab (\t)</option>
-    </select>
-  </div>
-</div>
+          <div class="setting-item">
+            <label for="setting-height"><strong>Height (px):</strong></label>
+            <input type="number" id="setting-height" value="2000">
+          </div>
 
+          <div class="setting-item">
+            <label for="setting-vsize"><strong>Vertex Size:</strong></label>
+            <input type="number" id="setting-vsize" value="50">
+          </div>
 
+          <div class="setting-item">
+            <label for="setting-lsize"><strong>Label Size:</strong></label>
+            <input type="number" id="setting-lsize" value="2">
+          </div>
 
-  <br/>
-  <button id="run-btn">Plot binning results</button>
+          <div class="setting-item">
+            <label for="setting-imgtype"><strong>Image Type:</strong></label>
+            <select id="setting-imgtype">
+              <option value="png" selected>PNG</option>
+              <option value="svg">SVG</option>
+              <option value="pdf">PDF</option>
+            </select>
+          </div>
 
-  <h2>Output</h2>
-  <div id="output"></div>
+          <div class="setting-item">
+            <label for="setting-delimiter"><strong>Delimiter:</strong></label>
+            <select id="setting-delimiter">
+              <option value="," selected>Comma (,)</option>
+              <option value="\t">Tab (\t)</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-  <h2>Plots</h2>
+      <div class="button-row">
+        <button id="run-btn" class="btn primary">Plot binning results</button>
+        <button id="example-btn" class="btn secondary">Run example data</button>
+      </div>
+    </section>
 
-    <div id="plots-row">
+    <!-- Output panel -->
+    <section class="panel">
+      <h2>Output</h2>
+      <div id="output">(logs will appear here)</div>
+    </section>
 
+    <!-- Plots panel -->
+    <section class="panel">
+      <h2>Plots</h2>
+      <div id="plots-row">
         <div class="plot-block" id="initial-block" style="display:none;">
-            <img id="initial-img" alt="Initial binning plot" />
-            <button id="download-initial">Download initial binning result plot</button>
+          <img id="initial-img" alt="Initial binning plot" />
+          <button id="download-initial" class="btn tertiary">
+            Download initial binning result plot
+          </button>
         </div>
 
         <div class="plot-block" id="final-block" style="display:none;">
-            <img id="final-img" alt="GraphBin binning plot" />
-            <button id="download-final">Download GraphBin binning result plot</button>
+          <img id="final-img" alt="GraphBin binning plot" />
+          <button id="download-final" class="btn tertiary">
+            Download GraphBin binning result plot
+          </button>
         </div>
-
-    </div>
+      </div>
+    </section>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
   <script src="app.js"></script>
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css" />
 </body>
 </html>
