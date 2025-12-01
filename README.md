@@ -4,9 +4,14 @@ A **browser-based interactive visualisation tool** for comparing **initial binni
 
 This project uses Pyodide (Python compiled to WebAssembly) to run `igraph`, GraphBin’s graph visualisation code, and the plotting code entirely in the browser — no backend needed.
 
-## Live Demo
+## Live Demo (Anyone can use)
 
 Please go to [metagentools.github.io/graphbin-visualise-wasm-app/](https://metagentools.github.io/graphbin-visualise-wasm-app/) for a live demo hosted on GitHub Pages. 
+
+No installation needed! If you want to run it locally:
+* Python **not required**
+* Node.js **not required**
+* Only a modern browser: Chrome, Firefox, Safari or Edge
 
 ## Features
 
@@ -18,7 +23,7 @@ Please go to [metagentools.github.io/graphbin-visualise-wasm-app/](https://metag
 * Client-side file handling — your data never leaves your computer
 * Download generated plots
 * Built-in test data for immediate demonstration
-* Pure static site — works on GitHub Pages, Netlify, etc.
+* Pure static site — works on GitHub Pages.
 
 ## Technologies Used
 
@@ -29,15 +34,7 @@ Please go to [metagentools.github.io/graphbin-visualise-wasm-app/](https://metag
 * HTML/CSS user interface
 * [GraphBin plotting logic](https://github.com/metagentools/GraphBin/tree/develop/src/graphbin/support)
 
-## Requirements
-
-No installation needed! If you want to run it locally:
-* Python **not required**
-* Node.js **not required**
-* Only a modern browser: Chrome, Firefox, Safari or Edge
-
-
-## Running the App Locally
+## Running the App Locally (Advanced)
 
 Clone the repository:
 
@@ -46,7 +43,7 @@ git clone https://github.com/<yourname>/graphbin-visualise-wasm-app.git
 cd graphbin-visualise-wasm-app
 ```
 
-Because the browser cannot fetch local files with file:///, you must serve it with a lightweight local server. You will need Python for this step.
+Because the browser cannot fetch local files with `file:///`, you must serve it with a lightweight local server. You will need Python for this step.
 
 ```shell
 python3 -m http.server 8000
