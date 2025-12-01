@@ -4,7 +4,7 @@ A **browser-based interactive visualisation tool** for comparing **initial binni
 
 This project uses Pyodide (Python compiled to WebAssembly) to run `igraph`, GraphBin’s graph visualisation code, and the plotting code entirely in the browser — no backend needed.
 
-## Live Demo (Anyone can use)
+## Web App (Anyone can use)
 
 Please go to [metagentools.github.io/graphbin-visualise-wasm-app/](https://metagentools.github.io/graphbin-visualise-wasm-app/) for a live demo hosted on GitHub Pages. 
 
@@ -43,10 +43,10 @@ cd graphbin-visualise-wasm-app
 Because the browser cannot fetch local files with `file:///`, you must serve it with a lightweight local server. You will need Python for this step.
 
 ```shell
-python3 -m http.server 8000
+python -m http.server 8000
 ```
 
-Then open the following link in your web browser.
+Then copy and paste the following link in your web browser.
 ```shell
 http://localhost:8000
 ```
