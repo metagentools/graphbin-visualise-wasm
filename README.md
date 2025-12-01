@@ -8,10 +8,7 @@ This project uses Pyodide (Python compiled to WebAssembly) to run `igraph`, Grap
 
 Please go to [metagentools.github.io/graphbin-visualise-wasm-app/](https://metagentools.github.io/graphbin-visualise-wasm-app/) for a live demo hosted on GitHub Pages. 
 
-No installation needed! If you want to run it locally:
-* Python **not required**
-* Node.js **not required**
-* Only a modern browser: Chrome, Firefox, Safari or Edge
+No installation needed! Python **not required**. Node.js **not required**. You only need a modern browser such as Chrome, Firefox, Safari or Edge.
 
 ## Features
 
