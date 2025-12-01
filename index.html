@@ -1,11 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dummy Page</title>
+  <meta charset="UTF-8" />
+  <title>GraphBin Visualise Wasm App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <p>This is a very short dummy HTML page.</p>
+  <h1>GraphBin Visualise Wasm App</h1>
+
+  <h2>Input files</h2>
+  <div>
+    <label><strong>GFA file: </strong> <input id="graph" type="file"></label>
+  </div>
+  <div>
+    <label><strong>Contigs file: </strong> <input id="contigs" type="file"></label>
+  </div>
+  <div>
+    <label><strong>Paths file: </strong> <input id="paths" type="file"></label>
+  </div>
+  <div>
+    <label><strong>Initial binning result: </strong> <input id="initial" type="file"></label>
+  </div>
+  <div>
+    <label><strong>GraphBin result: </strong> <input id="graphbin" type="file"></label>
+  </div>
+
+  <div id="settings-panel">
+  <h2>Plot Settings</h2>
+
+  <div class="setting-item">
+    <label for="setting-prefix"><strong>Prefix: </strong></label>
+    <input type="text" id="setting-prefix" value="">
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-dpi"><strong>DPI: </strong></label>
+    <input type="number" id="setting-dpi" value="300">
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-width"><strong>Width (px): </strong></label>
+    <input type="number" id="setting-width" value="2000">
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-height"><strong>Height (px): </strong></label>
+    <input type="number" id="setting-height" value="2000">
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-vsize"><strong>Vertex Size: </strong></label>
+    <input type="number" id="setting-vsize" value="50">
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-lsize"><strong>Label Size: </strong></label>
+    <input type="number" id="setting-lsize" value="2">
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-margin"><strong>Margin: </strong></label>
+    <input type="number" id="setting-margin" value="10">
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-imgtype"><strong>Image Type: </strong></label>
+    <select id="setting-imgtype">
+      <option value="png" selected>PNG</option>
+      <option value="svg">SVG</option>
+      <option value="pdf">PDF</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="setting-delimiter"><strong>Delimiter: </strong></label>
+    <select id="setting-delimiter">
+      <option value="," selected>Comma (,)</option>
+      <option value="\t">Tab (\t)</option>
+    </select>
+  </div>
+</div>
+
+
+
+  <br/>
+  <button id="run-btn">Plot binning results</button>
+
+  <h2>Output</h2>
+  <div id="output"></div>
+
+  <h2>Plots</h2>
+
+    <div id="plots-row">
+
+        <div class="plot-block" id="initial-block" style="display:none;">
+            <img id="initial-img" alt="Initial binning plot" />
+            <button id="download-initial">Download initial binning result plot</button>
+        </div>
+
+        <div class="plot-block" id="final-block" style="display:none;">
+            <img id="final-img" alt="GraphBin binning plot" />
+            <button id="download-final">Download GraphBin binning result plot</button>
+        </div>
+
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
+  <script src="app.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
 </body>
 </html>

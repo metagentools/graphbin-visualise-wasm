@@ -1,0 +1,44 @@
+body { font-family: sans-serif; margin: 1rem; }
+
+
+#plots-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.plot-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plot-block img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 800px) {
+  #plots-row {
+    flex-direction: column;
+  }
+}
+
+
+#output {
+  font-family: Menlo, Consolas, "Courier New", monospace;
+  font-size: 14px; /* optional */
+  white-space: pre-wrap; /* keeps formatting but wraps long lines */
+  white-space: pre-wrap;          /* preserve formatting, wrap long lines */
+  overflow-y: auto;               /* scroll when long */
+  min-height: 150px;
+  max-height: 250px;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px; 
+  padding: 0.75rem; 
+}
