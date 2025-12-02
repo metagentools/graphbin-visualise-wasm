@@ -36,7 +36,7 @@ No installation needed! Python **not required**. Node.js **not required**. You o
 Clone the repository:
 
 ```shell
-git clone https://github.com/<yourname>/graphbin-visualise-wasm-app.git
+git clone https://github.com/metagentools/graphbin-visualise-wasm-app.git
 cd graphbin-visualise-wasm-app
 ```
 
