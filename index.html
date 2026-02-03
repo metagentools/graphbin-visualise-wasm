@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GraphBin Visualise Wasm App</title>
+  <title>GraphBin Visualise Wasm</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css" />
@@ -10,7 +10,7 @@
 <body>
   <div class="app">
     <header class="app-header">
-      <h1>GraphBin Visualise Wasm App</h1>
+      <h1>GraphBin Visualise Wasm</h1>
       <p class="subtitle">
         Visualise and compare metagenomic binning results and improved binning results from GraphBin directly in your browser.<br>
         You can load your own data and click <b>Plot binning results</b>, or click <b>Run example data</b> to see how it works on the example data provided.
@@ -166,7 +166,84 @@
         </div>
       </div>
     </section>
+
+
+    <!-- Interactive panel -->
+    <section class="panel">
+      <h2>Interactive View</h2>
+
+      <div class="interactive-grid">
+        <div class="interactive-controls">
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="view-mode">Binning to display</label>
+              <div class="control">
+                <select id="view-mode">
+                  <option value="initial">Initial</option>
+                  <option value="final" selected>GraphBin</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="bin-filter">Show only bin</label>
+              <div class="control">
+                <select id="bin-filter">
+                  <option value="">(all bins)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="toggle-hide-unbinned">Hide unbinned</label>
+              <div class="control">
+                <label class="cb">
+                  <input id="toggle-hide-unbinned" type="checkbox" />
+                  <span class="cb-box" aria-hidden="true"></span>
+              </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="toggle-only-changed">Show only changed</label>
+              <div class="control">
+                <label class="cb">
+                  <input id="toggle-only-changed" type="checkbox" />
+                  <span class="cb-box" aria-hidden="true"></span>
+              </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label></label>
+              <div class="control">
+                <button id="reset-view" class="btn secondary">Reset view</button>
+              </div>
+            </div>
+          </div>
+          
+
+          <div class="legend-hint">
+            <div><b>Controls</b></div>
+            <div>Wheel: zoom</div>
+            <div>Drag: pan</div>
+            <div>Hover: tooltip</div>
+            <div>Click: lock selection</div>
+          </div>
+
+          <div class="legend-title">Bin legend</div>
+          <div id="bin-legend" class="bin-legend"></div>
+
+        </div>
+
+        <div class="interactive-canvas-wrap">
+          <canvas id="graph-canvas" width="900" height="700"></canvas>
+          <div id="hover-tooltip" class="tooltip" style="display:none;"></div>
+        </div>
+      </div>
+    </section>
   </div>
+
 
   <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
   <script src="app.js"></script>
