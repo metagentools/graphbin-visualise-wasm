@@ -2,6 +2,7 @@ import random
 import re
 import csv
 from collections import defaultdict
+import numpy as np
 
 from igraph import *
 from bidictmap import BidirectionalMap
@@ -9,8 +10,30 @@ from bidictmap import BidirectionalMap
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 
 from igraph import plot as ig_plot
+
+
+def generate_distinct_colours(bins: int):
+    if bins <= 0:
+        return []
+
+    # High-quality categorical palettes first
+    if bins <= 10:
+        cmap = plt.get_cmap("tab10", bins)
+        cols = [mcolors.to_hex(cmap(i)) for i in range(bins)]
+    elif bins <= 20:
+        cmap = plt.get_cmap("tab20", bins)
+        cols = [mcolors.to_hex(cmap(i)) for i in range(bins)]
+    else:
+        # Evenly spaced hues around the colour wheel (good for many bins)
+        hues = np.linspace(0, 1, bins, endpoint=False)
+        cols = [mcolors.to_hex(mcolors.hsv_to_rgb((h, 0.75, 0.95))) for h in hues]
+
+    return cols
+
 
 def draw_graph_with_matplotlib(graph, out_name, visual_style, dpi=300, width=2000, height=2000):
     """
@@ -26,6 +49,7 @@ def draw_graph_with_matplotlib(graph, out_name, visual_style, dpi=300, width=200
     ig_plot(graph, target=ax, **visual_style)
     fig.savefig(out_name, dpi=dpi, bbox_inches="tight")
     plt.close(fig)
+
 
 def run(args):
 
@@ -226,30 +250,32 @@ def run(args):
     # Get list of colours according to number of bins
     # -------------------------------------------------
 
-    my_colours = [
-        "#e6194b",
-        "#3cb44b",
-        "#ffe119",
-        "#4363d8",
-        "#f58231",
-        "#911eb4",
-        "#46f0f0",
-        "#f032e6",
-        "#bcf60c",
-        "#fabebe",
-        "#008080",
-        "#e6beff",
-        "#9a6324",
-        "#fffac8",
-        "#800000",
-        "#aaffc3",
-        "#808000",
-        "#ffd8b1",
-        "#000075",
-        "#808080",
-        "#ffffff",
-        "#000000",
-    ]
+    # my_colours = [
+    #     "#e6194b",
+    #     "#3cb44b",
+    #     "#ffe119",
+    #     "#4363d8",
+    #     "#f58231",
+    #     "#911eb4",
+    #     "#46f0f0",
+    #     "#f032e6",
+    #     "#bcf60c",
+    #     "#fabebe",
+    #     "#008080",
+    #     "#e6beff",
+    #     "#9a6324",
+    #     "#fffac8",
+    #     "#800000",
+    #     "#aaffc3",
+    #     "#808000",
+    #     "#ffd8b1",
+    #     "#000075",
+    #     "#808080",
+    #     "#ffffff",
+    #     "#000000",
+    # ]
+
+    my_colours = generate_distinct_colours(len(bins))
 
     # Visualise the initial assembly graph
     # --------------------------------------
