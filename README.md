@@ -1,34 +1,62 @@
 # GraphBin `visualise` WASM
 
-A **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs.
+A **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs, including both static plots and a fully interactive graph view.
 
 This project uses Pyodide (Python compiled to WebAssembly) to run `igraph`, GraphBin’s graph visualisation code, and the plotting code entirely in the browser — no backend needed.
 
 ## Web App (Anyone can use)
 
-Please go to [metagentools.github.io/graphbin-visualise-wasm/](https://metagentools.github.io/graphbin-visualise-wasm/) for a live demo hosted on GitHub Pages. 
+🌐 Live demo:
+[metagentools.github.io/graphbin-visualise-wasm/](https://metagentools.github.io/graphbin-visualise-wasm/)
 
 No installation needed! Python **not required**. Node.js **not required**. You only need a modern browser such as Chrome, Firefox, Safari or Edge.
 
 ## Features
 
+### Static Graph Plots
+
 * Run GraphBin plotting fully in the browser using WebAssembly
-* Supports SPAdes assembler layout (GFA, contigs FASTA, contig paths). Support for MEGAHIT and Flye is coming soon.
-* Upload your initial binning + GraphBin binning results
-* Adjustable plot settings: 1) DPI, 2) width, 3) height, 4) vertex size, 5) label size and 5) image size
-* Automatically renders two plots: 1) initial binning plot and 2) GraphBin-refined binning plot
-* Client-side file handling — your data never leaves your computer
+* Supports SPAdes assembler layout (GFA, contigs FASTA, contig paths)
+* Upload initial binning and GraphBin-refined binning results
+* Adjustable plot settings:
+  * DPI
+  * Width / height
+  * Vertex size
+  * Label size
+  * Image type
+* Automatically renders:
+  * Initial binning plot
+  * GraphBin-refined binning plot
 * Download generated plots
-* Built-in test data for immediate demonstration
-* Pure static site — works on GitHub Pages.
+
+### Interactive Assembly Graph Visualisation
+
+* Interactive assembly graph with binning results
+* Hover tooltips per contig showing:
+  * Contig ID
+  * Length
+  * GC content
+  * Coverage
+  * Degree
+  * Bin assignments
+* Zoom, pan, and explore complex graphs visually
+* Toggle visibility of bins and contigs
+* Designed for exploratory analysis and quality assessment
+
+### General
+
+* Built-in test data for instant demonstration
+* Client-side file handling - your data never leaves your computer
+* Pure static site — works on GitHub Pages
+
 
 ## Technologies Used
 
 * Pyodide (Python → WebAssembly)
 * igraph (graph processing + plotting)
-* matplotlib (Pyodide backend) for image generation
-* JavaScript for UI + FS bridging
-* HTML/CSS user interface
+* matplotlib (Pyodide backend) for static image generation
+* JavaScript (ES6) application logic
+* HTML5/CSS3 user interface
 * [GraphBin plotting logic](https://github.com/metagentools/GraphBin/tree/develop/src/graphbin/support)
 
 ## Running the App Locally (Advanced)
