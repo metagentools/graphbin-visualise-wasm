@@ -244,9 +244,46 @@
         </div>
       </div>
     </section>
+
+
+    <!-- Sankey panel -->
+    <section class="panel">
+      <h2>Contig flow between binnings</h2>
+
+      <div class="sankey-controls">
+        <div class="sankey-controls-left">
+          <label class="cb">
+            <input id="sankey-only-changed" type="checkbox" />
+            <span class="cb-box" aria-hidden="true"></span>
+            <span class="cb-text">Only contigs that changed bin</span>
+          </label>
+
+          <label class="cb">
+            <input id="sankey-hide-unbinned" type="checkbox" />
+            <span class="cb-box" aria-hidden="true"></span>
+            <span class="cb-text">Hide unbinned</span>
+          </label>
+        </div>
+
+        <div class="sankey-controls-right">
+          <div class="sankey-hint">Click a flow to highlight it.</div>
+        </div>
+      </div>
+
+      <div class="sankey-wrap">
+        <div class="sankey-title-row">
+          <div id="sankey-left-title" class="sankey-title">Binning 1</div>
+          <div id="sankey-right-title" class="sankey-title">Binning 2</div>
+        </div>
+        <svg id="sankey-svg" role="img" aria-label="Sankey diagram showing contig bin changes"></svg>
+        <div id="sankey-tooltip" class="tooltip" style="display:none;"></div>
+      </div>
+    </section>
   </div>
 
 
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
   <script src="app.js"></script>
 </body>

@@ -253,7 +253,7 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
         "nodes": nodes,
         "edges": edges,
         "bin_colors": bin_colors,        # EXACT match to PNG plots
-        "unbinned_color": "white"         # same as spades_plot.py
+        "unbinned_color": "#d3d3d3"         # same as spades_plot.py
     }
 
     with open(out_json, "w", encoding="utf-8") as f:

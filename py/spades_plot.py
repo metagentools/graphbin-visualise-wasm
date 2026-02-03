@@ -300,7 +300,7 @@ def run(args):
                 no_bin = False
 
         if no_bin:
-            node_colours.append("white")
+            node_colours.append("#d3d3d3")
 
     assembly_graph.vs["color"] = node_colours
 
@@ -373,7 +373,7 @@ def run(args):
                 no_bin = False
 
         if no_bin:
-            node_colours.append("white")
+            node_colours.append("#d3d3d3")
 
     assembly_graph.vs["color"] = node_colours
 

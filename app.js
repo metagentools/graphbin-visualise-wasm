@@ -36,6 +36,9 @@ let lastMouse = { x: 0, y: 0 };
 let hoverNodeId = null;
 let lockedNodeId = null;
 
+// sankey state
+let sankeyLocked = null; // {srcBin, dstBin} or null
+
 // filters
 let filters = {
   mode: "final", // "initial" or "final"
@@ -52,6 +55,103 @@ let spatial = { cell: 20, map: new Map() };
 
 // bin -> color (stable palette per dataset)
 let binColorMap = new Map();
+
+
+document.getElementById("sankey-left-title").textContent =
+  (window.binningNames?.left) || "Initial binning";
+
+document.getElementById("sankey-right-title").textContent =
+  (window.binningNames?.right) || "GraphBin";
+
+
+function resetInteractiveViews() {
+  /* =============================
+   * Reset global interaction state
+   * ============================= */
+  window.selectedNode = null;
+  window.selectedBin = null;
+  window.hoveredNode = null;
+  window.lockedSelection = false;
+
+  // Sankey-specific state
+  window.sankeyLocked = false;
+  window.sankeyLockedKey = null;
+
+  // Zoom / pan state (if used)
+  window.currentTransform = null;
+
+  /* =============================
+   * Clear interactive canvas plot
+   * ============================= */
+  const canvas = document.getElementById("graph-canvas");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset zoom/pan
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  /* =============================
+   * Clear bin legend
+   * ============================= */
+  const legend = document.getElementById("bin-legend");
+  if (legend) {
+    legend.innerHTML = "";
+  }
+
+  /* =============================
+   * Hide interactive tooltip
+   * ============================= */
+  const tooltip = document.getElementById("hover-tooltip");
+  if (tooltip) {
+    tooltip.style.display = "none";
+    tooltip.innerHTML = "";
+  }
+
+  /* =============================
+   * Clear Sankey diagram
+   * ============================= */
+  const sankeySvg = document.getElementById("sankey-svg");
+  if (sankeySvg) {
+    sankeySvg.replaceChildren(); // removes all nodes, links, labels
+  }
+
+  const sankeyTooltip = document.getElementById("sankey-tooltip");
+  if (sankeyTooltip) {
+    sankeyTooltip.style.display = "none";
+    sankeyTooltip.innerHTML = "";
+  }
+
+  /* =============================
+   * Reset controls to defaults
+   * ============================= */
+
+  // Binning to display → GraphBin (final)
+  const viewMode = document.getElementById("view-mode");
+  if (viewMode) {
+    viewMode.value = "final";
+  }
+
+  // Bin filter → (all bins)
+  const binFilter = document.getElementById("bin-filter");
+  if (binFilter) {
+    binFilter.value = "";
+  }
+
+  // Hide unbinned → unchecked
+  const hideUnbinned = document.getElementById("toggle-hide-unbinned");
+  if (hideUnbinned) {
+    hideUnbinned.checked = false;
+  }
+
+  // Show only changed → unchecked
+  const onlyChanged = document.getElementById("toggle-only-changed");
+  if (onlyChanged) {
+    onlyChanged.checked = false;
+  }
+}
+
+
+
 
 /* =========================
    File size checks
@@ -271,6 +371,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
     buildBinColorMap();
     renderBinLegend();
     initInteractiveUI();
+    initSankeyUI();
 
     // Ensure first layout uses actual DOM sizes
     requestAnimationFrame(() => {
@@ -278,6 +379,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
       fitToView(graphModel);
       rebuildSpatialIndex();
       render();
+      renderSankey();
     });
 
     log(`Interactive graph loaded (nodes=${graphModel.nodes.length}, edges=${graphModel.edges.length}).`);
@@ -394,12 +496,14 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
     buildBinColorMap();
     renderBinLegend();
     initInteractiveUI();
+    initSankeyUI();
 
     requestAnimationFrame(() => {
       resizeCanvasToDisplaySize();
       fitToView(graphModel);
       rebuildSpatialIndex();
       render();
+      renderSankey();
     });
 
     log(`Interactive graph loaded (nodes=${graphModel.nodes.length}, edges=${graphModel.edges.length}).`);
@@ -415,6 +519,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
    Buttons
    ========================= */
 document.getElementById("run-btn").addEventListener("click", () => {
+  resetInteractiveViews();
   runInputPlot().catch((err) => {
     console.error(err);
     log("Error: " + err);
@@ -422,6 +527,7 @@ document.getElementById("run-btn").addEventListener("click", () => {
 });
 
 document.getElementById("example-btn").addEventListener("click", () => {
+  resetInteractiveViews();
   runExamplePlot().catch((err) => {
     console.error(err);
     log("Error (example): " + err);
@@ -524,7 +630,7 @@ function buildBinColorMap() {
 }
 
 function colorForBin(bin) {
-  if (!bin) return (graphModel?.unbinned_color || "white"); // match PNG plots
+  if (!bin) return (graphModel?.unbinned_color || "#d3d3d3"); // match PNG plots
   return binColorMap.get(bin) || "#6b7280";
 }
 
@@ -535,7 +641,7 @@ function renderBinLegend() {
   el.innerHTML = "";
 
   // Add unbinned
-  el.appendChild(makeLegendRow("(unbinned)", "#ffffff"));
+  el.appendChild(makeLegendRow("(unbinned)", "#d3d3d3"));
 
   // bins in sorted order for consistency
   const entries = [...binColorMap.entries()].sort((a, b) =>
@@ -713,6 +819,212 @@ function initInteractiveUI() {
   });
 
   populateBinFilter();
+}
+
+/* =========================
+   Sankey: UI + rendering
+   ========================= */
+function initSankeyUI() {
+  const svg = document.getElementById("sankey-svg");
+  if (!svg) return;
+
+  // controls
+  attachControl("sankey-only-changed", "change", () => {
+    sankeyLocked = null;
+    renderSankey();
+  });
+
+  attachControl("sankey-hide-unbinned", "change", () => {
+    sankeyLocked = null;
+    renderSankey();
+  });
+
+  // resize
+  if (!svg.dataset._resizeBound) {
+    window.addEventListener("resize", () => {
+      renderSankey();
+    });
+    svg.dataset._resizeBound = "1";
+  }
+}
+
+function getSankeyOptions() {
+  const onlyChanged = !!document.getElementById("sankey-only-changed")?.checked;
+  const hideUnbinned = !!document.getElementById("sankey-hide-unbinned")?.checked;
+  return { onlyChanged, hideUnbinned };
+}
+
+function buildSankeyData(model, opts) {
+  const UN = "(unbinned)";
+  const flows = new Map(); // key: init\tfin -> count
+  const srcBins = new Set();
+  const dstBins = new Set();
+
+  for (const n of model.nodes) {
+    if (opts.onlyChanged && !n.changed) continue;
+    const s = (n.initial_bin == null || n.initial_bin === "") ? UN : String(n.initial_bin);
+    const t = (n.final_bin == null || n.final_bin === "") ? UN : String(n.final_bin);
+    if (opts.hideUnbinned && (s === UN || t === UN)) continue;
+
+    srcBins.add(s);
+    dstBins.add(t);
+    const key = s + "\t" + t;
+    flows.set(key, (flows.get(key) || 0) + 1);
+  }
+
+  // stable order
+  const src = [...srcBins].sort((a, b) => a.localeCompare(b));
+  const dst = [...dstBins].sort((a, b) => a.localeCompare(b));
+
+  const nodes = [];
+  const idx = new Map();
+
+  for (const b of src) {
+    const name = "Initial: " + b;
+    idx.set(name, nodes.length);
+    nodes.push({ name, side: "initial", bin: b });
+  }
+  for (const b of dst) {
+    const name = "GraphBin: " + b;
+    idx.set(name, nodes.length);
+    nodes.push({ name, side: "final", bin: b });
+  }
+
+  const links = [];
+  for (const [key, value] of flows.entries()) {
+    const [s, t] = key.split("\t");
+    const sName = "Initial: " + s;
+    const tName = "GraphBin: " + t;
+    links.push({
+      source: idx.get(sName),
+      target: idx.get(tName),
+      value,
+      srcBin: s,
+      dstBin: t,
+    });
+  }
+
+  return { nodes, links };
+}
+
+function renderSankey() {
+  const svgEl = document.getElementById("sankey-svg");
+  if (!svgEl || !window.d3 || !window.d3.sankey || !graphModel) return;
+
+  const opts = getSankeyOptions();
+  const tooltip = document.getElementById("sankey-tooltip");
+
+  // Clear any stale tooltip
+  if (tooltip) tooltip.style.display = "none";
+
+  const wrap = svgEl.parentElement;
+  const width = Math.max(320, wrap?.clientWidth || 900);
+  const height = svgEl.clientHeight || 520;
+
+  const svg = d3.select(svgEl);
+  svg.selectAll("*").remove();
+  svg.attr("viewBox", `0 0 ${width} ${height}`);
+
+  const data = buildSankeyData(graphModel, opts);
+  if (data.links.length === 0 || data.nodes.length === 0) {
+    svg.append("text")
+      .attr("x", 16)
+      .attr("y", 24)
+      .attr("font-size", 14)
+      .attr("fill", "#6b7280")
+      .text("No contigs match the current Sankey filters.");
+    return;
+  }
+
+  const sankey = d3.sankey()
+    .nodeWidth(16)
+    .nodePadding(12)
+    .extent([[16, 16], [width - 16, height - 16]]);
+
+  // d3-sankey mutates in-place; use shallow clones
+  const graph = sankey({
+    nodes: data.nodes.map((d) => ({ ...d })),
+    links: data.links.map((d) => ({ ...d })),
+  });
+
+  const linkKey = (l) => `${l.srcBin}\t${l.dstBin}`;
+
+  // links
+  const linkG = svg.append("g").attr("fill", "none");
+
+  const linkSel = linkG
+    .selectAll("path")
+    .data(graph.links)
+    .join("path")
+    .attr("d", d3.sankeyLinkHorizontal())
+    .attr("stroke-width", (d) => Math.max(1, d.width))
+    .attr("stroke", (d) => colorForBin(d.srcBin === "(unbinned)" ? null : d.srcBin))
+    .attr("stroke-opacity", (d) => {
+      if (!sankeyLocked) return 0.35;
+      return (d.srcBin === sankeyLocked.srcBin && d.dstBin === sankeyLocked.dstBin) ? 0.85 : 0.08;
+    })
+    .style("cursor", "pointer")
+    .on("click", (event, d) => {
+      event.preventDefault();
+      const hit = { srcBin: d.srcBin, dstBin: d.dstBin };
+      if (sankeyLocked && sankeyLocked.srcBin === hit.srcBin && sankeyLocked.dstBin === hit.dstBin) {
+        sankeyLocked = null;
+      } else {
+        sankeyLocked = hit;
+      }
+      renderSankey();
+    });
+
+  // tooltip
+  linkSel
+    .on("mousemove", (event, d) => {
+      if (!tooltip) return;
+      const rect = wrap.getBoundingClientRect();
+      tooltip.style.display = "block";
+      tooltip.style.left = (event.clientX - rect.left + 12) + "px";
+      tooltip.style.top = (event.clientY - rect.top + 12) + "px";
+      const s = d.srcBin;
+      const t = d.dstBin;
+      tooltip.innerHTML = `
+        <div><b>${escapeHtml(s)}</b> → <b>${escapeHtml(t)}</b></div>
+        <div>contigs: ${d.value}</div>
+      `;
+    })
+    .on("mouseleave", () => {
+      if (tooltip) tooltip.style.display = "none";
+    });
+
+  // nodes
+  const node = svg
+    .append("g")
+    .selectAll("g")
+    .data(graph.nodes)
+    .join("g");
+
+  node
+    .append("rect")
+    .attr("x", (d) => d.x0)
+    .attr("y", (d) => d.y0)
+    .attr("height", (d) => Math.max(1, d.y1 - d.y0))
+    .attr("width", (d) => d.x1 - d.x0)
+    .attr("rx", 3)
+    .attr("ry", 3)
+    .attr("fill", (d) => colorForBin(d.bin === "(unbinned)" ? null : d.bin))
+    .attr("stroke", "rgba(0,0,0,0.25)");
+
+  node
+    .append("text")
+    .attr("x", (d) => (d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6))
+    .attr("y", (d) => (d.y0 + d.y1) / 2)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
+    .attr("font-size", 12)
+    .attr("fill", "#111827")
+    .text((d) => {
+      // strip the side prefix for the label to keep it compact
+      const s = d.name.includes(": ") ? d.name.split(": ")[1] : d.name;
+      return s;
+    });
 }
 
 function attachControl(id, event, handler) {
