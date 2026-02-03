@@ -10,7 +10,7 @@
 <body>
   <div class="app">
     <header class="app-header">
-      <h1>GraphBin Visualise Wasm App</h1>
+      <h1>GraphBin Visualise Wasm</h1>
       <p class="subtitle">
         Visualise and compare metagenomic binning results and improved binning results from GraphBin directly in your browser.<br>
         You can load your own data and click <b>Plot binning results</b>, or click <b>Run example data</b> to see how it works on the example data provided.
@@ -24,36 +24,50 @@
         <div id="input-files-col">
           <h3>Input Files</h3>
 
-          <div class="setting-item">
-            <label for="assembler"><strong>Assembler:</strong></label>
-            <select id="assembler">
-              <option value="spades" selected>SPAdes</option>
-            </select>
-          </div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="assembler">Assembler</label>
+              <div class="control">
+                <select id="assembler">
+                  <option value="spades" selected>SPAdes</option>
+                </select>
+              </div>
+            </div>
 
-          <div class="config-item">
-            <label><strong>GFA file:</strong></label>
-            <input id="graph" type="file">
-          </div>
+            <div class="form-row">
+              <label for="graph">GFA file</label>
+              <div class="control">
+                <input id="graph" type="file">
+              </div>
+            </div>
 
-          <div class="config-item">
-            <label><strong>Contigs file:</strong></label>
-            <input id="contigs" type="file">
-          </div>
+            <div class="form-row">
+              <label for="contigs">Contigs file</label>
+              <div class="control">
+                <input id="contigs" type="file">
+              </div>
+            </div>
 
-          <div class="config-item">
-            <label><strong>Paths file:</strong></label>
-            <input id="paths" type="file">
-          </div>
+            <div class="form-row">
+              <label for="paths">Paths file</label>
+              <div class="control">
+                <input id="paths" type="file">
+              </div>
+            </div>
 
-          <div class="config-item">
-            <label><strong>Initial binning result:</strong></label>
-            <input id="initial" type="file">
-          </div>
+            <div class="form-row">
+              <label for="initial">Initial binning result</label>
+              <div class="control">
+                <input id="initial" type="file">
+              </div>
+            </div>
 
-          <div class="config-item">
-            <label><strong>GraphBin result:</strong></label>
-            <input id="graphbin" type="file">
+            <div class="form-row">
+              <label for="graphbin">GraphBin result</label>
+              <div class="control">
+                <input id="graphbin" type="file">
+              </div>
+            </div>
           </div>
         </div>
 
@@ -61,46 +75,62 @@
         <div id="settings-panel">
           <h3>Plot Settings</h3>
 
-          <div class="setting-item">
-            <label for="setting-dpi"><strong>DPI:</strong></label>
-            <input type="number" id="setting-dpi" value="300">
-          </div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="setting-dpi">DPI</label>
+              <div class="control">
+                <input type="number" id="setting-dpi" value="300">
+              </div>
+            </div>
 
-          <div class="setting-item">
-            <label for="setting-width"><strong>Width (px):</strong></label>
-            <input type="number" id="setting-width" value="2000">
-          </div>
+            <div class="form-row">
+              <label for="setting-width">Width (px)</label>
+              <div class="control">
+                <input type="number" id="setting-width" value="2000">
+              </div>
+            </div>
 
-          <div class="setting-item">
-            <label for="setting-height"><strong>Height (px):</strong></label>
-            <input type="number" id="setting-height" value="2000">
-          </div>
+            <div class="form-row">
+              <label for="setting-height">Height (px)</label>
+              <div class="control">
+                <input type="number" id="setting-height" value="2000">
+              </div>
+            </div>
 
-          <div class="setting-item">
-            <label for="setting-vsize"><strong>Vertex Size:</strong></label>
-            <input type="number" id="setting-vsize" value="50">
-          </div>
+            <div class="form-row">
+              <label for="setting-vsize">Vertex Size</label>
+              <div class="control">
+                <input type="number" id="setting-vsize" value="50">
+              </div>
+            </div>
 
-          <div class="setting-item">
-            <label for="setting-lsize"><strong>Label Size:</strong></label>
-            <input type="number" id="setting-lsize" value="2">
-          </div>
+            <div class="form-row">
+              <label for="setting-lsize">Label Size</label>
+              <div class="control">
+                <input type="number" id="setting-lsize" value="2">
+              </div>
+            </div>
 
-          <div class="setting-item">
-            <label for="setting-imgtype"><strong>Image Type:</strong></label>
-            <select id="setting-imgtype">
-              <option value="png" selected>PNG</option>
-              <option value="svg">SVG</option>
-              <option value="pdf">PDF</option>
-            </select>
-          </div>
+            <div class="form-row">
+              <label for="setting-imgtype">Image Type</label>
+              <div class="control">
+                <select id="setting-imgtype">
+                  <option value="png" selected>PNG</option>
+                  <option value="svg">SVG</option>
+                  <option value="pdf">PDF</option>
+                </select>
+              </div>
+            </div>
 
-          <div class="setting-item">
-            <label for="setting-delimiter"><strong>Delimiter:</strong></label>
-            <select id="setting-delimiter">
-              <option value="," selected>Comma (,)</option>
-              <option value="\t">Tab (\t)</option>
-            </select>
+            <div class="form-row">
+              <label for="setting-delimiter">Delimiter</label>
+              <div class="control">
+                <select id="setting-delimiter">
+                  <option value="," selected>Comma (,)</option>
+                  <option value="\t">Tab (\t)</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>

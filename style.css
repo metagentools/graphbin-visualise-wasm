@@ -1,9 +1,22 @@
 /* Base layout */
+:root{
+  --bg: #f5f5f7;
+  --panel: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #d1d5db;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --radius: 12px;
+  --focus: rgba(37, 99, 235, 0.35);
+}
+
+*{ box-sizing: border-box; }
+
 body {
   margin: 0;
-  background: #f5f5f7;
+  background: var(--bg);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #111827;
+  color: var(--text);
 }
 
 .app {
@@ -16,77 +29,106 @@ body {
 .app-header h1 {
   margin: 0 0 4px;
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 750;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
   margin: 0 0 24px;
   color: #000000;
   font-size: 0.95rem;
+  line-height: 1.35;
 }
 
 /* Generic panel / card */
 .panel {
-  background: #ffffff;
-  border-radius: 12px;
+  background: var(--panel);
+  border-radius: var(--radius);
   padding: 20px 24px 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow);
   margin-bottom: 24px;
 }
 
 .panel h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
+  margin: 0 0 12px;
+}
+
+.panel h3 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 /* Two-column layout for config */
 #config-two-col {
-  display: flex;
-  gap: 32px;
-  align-items: flex-start;
-  flex-wrap: wrap; /* stack on small screens */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
 }
 
-#input-files-col,
-#settings-panel {
-  flex: 1 1 260px;
+@media (max-width: 900px) {
+  #config-two-col {
+    grid-template-columns: 1fr;
+  }
 }
 
-#input-files-col h3,
-#settings-panel h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-size: 1.05rem;
+/* Shared form grid */
+.form-grid{
+  display: grid;
+  gap: 12px;
 }
 
-/* Inputs + settings */
-.config-item,
-.setting-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
+/* Label + control aligned rows */
+.form-row{
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  align-items: center;
 }
 
-.config-item label,
-.setting-item label {
-  margin-bottom: 4px;
+@media (max-width: 520px){
+  .form-row{
+    grid-template-columns: 1fr;
+    gap: 6px;
+    align-items: start;
+  }
+}
+
+label{
   font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
 }
 
-.config-item input,
-.setting-item input,
-.setting-item select {
-  padding: 6px 8px;
-  font-size: 0.9rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+/* Inputs */
+input,
+select{
   width: 100%;
-  box-sizing: border-box;
+  height: 38px;
+  padding: 8px 10px;
+  font-size: 0.92rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+}
+
+input[type="file"]{
+  padding: 6px 10px;
+  height: 40px;
+}
+
+input:focus,
+select:focus{
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 /* Buttons */
 .button-row {
-  margin-top: 16px;
+  margin-top: 18px;
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
@@ -95,10 +137,10 @@ body {
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 0.9rem;
+  padding: 9px 16px;
+  font-size: 0.92rem;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease,
     box-shadow 0.15s ease;
 }
@@ -106,7 +148,7 @@ body {
 .btn.primary {
   background: #2563eb;
   color: #ffffff;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.28);
 }
 
 .btn.primary:hover {
@@ -152,8 +194,8 @@ body {
 .plot-block img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 
 /* Stack plots on narrow screens */
@@ -173,8 +215,8 @@ body {
   overflow-y: auto;
   min-height: 150px;
   max-height: 250px;
-  border-radius: 8px;
-  padding: 0.75rem;
+  border-radius: 10px;
+  padding: 0.85rem;
   border: 1px solid #4b5563;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
 }
