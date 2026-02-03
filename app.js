@@ -954,8 +954,9 @@ function formatTooltip(n) {
 
   return `
     <div><b>${escapeHtml(n.id)}</b></div>
-    <div>len: ${n.len ?? 0}</div>
+    <div>length: ${n.len ?? 0}bp</div>
     <div>GC%: ${n.gc == null ? "n/a" : Number(n.gc).toFixed(2)}</div>
+    <div>coverage: ${n.cov == null ? "n/a" : Number(n.cov).toFixed(2)}</div>
     <div>degree: ${deg}</div>
     <div>initial: ${escapeHtml(init)}</div>
     <div>final: ${escapeHtml(fin)}</div>

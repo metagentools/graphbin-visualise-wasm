@@ -140,6 +140,7 @@ def _read_binning(path, delimiter, contigs_map_rev):
 def _read_fasta_len_gc(contigs_fasta, contigs_map_rev):
     lengths = {}
     gcs = {}
+    covs = {}
 
     name = None
     seq = []
@@ -155,10 +156,15 @@ def _read_fasta_len_gc(contigs_fasta, contigs_map_rev):
             name, seq = None, []
             return
 
+        # parse coverage from header like: NODE_1_length_..._cov_16.379288
+        m = re.search(r"_cov_([0-9eE.+-]+)", name)
+        covs[v] = float(m.group(1)) if m else None
+
         s = "".join(seq).upper()
         L = len(s)
         lengths[v] = L
         gcs[v] = None if L == 0 else 100.0 * (s.count("G") + s.count("C")) / L
+
         name, seq = None, []
 
     with open(contigs_fasta, "r", encoding="utf-8", errors="ignore") as f:
@@ -172,7 +178,8 @@ def _read_fasta_len_gc(contigs_fasta, contigs_map_rev):
                 seq.append(line)
     flush()
 
-    return lengths, gcs
+    return lengths, gcs, covs
+
 
 
 # -----------------------------
@@ -197,8 +204,8 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
     initial_bins = _read_binning(initial_path, delimiter, contigs_map_rev)
     final_bins = _read_binning(final_path, delimiter, contigs_map_rev)
 
-    # lengths + GC
-    lengths, gcs = _read_fasta_len_gc(contigs_fasta, contigs_map_rev)
+    # lengths + GC + coverage
+    lengths, gcs, covs = _read_fasta_len_gc(contigs_fasta, contigs_map_rev)
 
     # layout (same algorithm)
     layout = g.layout_fruchterman_reingold()
@@ -233,7 +240,7 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
             "final_bin": fin_bin,
             "changed": init_bin != fin_bin,
             "degree": int(deg[v]),
-            "cov": None,
+            "cov": float(covs[v]) if v in covs and covs[v] is not None else None,
         })
 
     # edges (use NODE_ ids, not vertex indices)
