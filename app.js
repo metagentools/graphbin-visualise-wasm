@@ -1,5 +1,11 @@
 const outputEl = document.getElementById("output");
 
+const NODE_RADIUS = {
+  base: 4.5,     // default node radius (was ~3)
+  hover: 6.5,    // on hover
+  locked: 7.5,   // on click
+};
+
 // Initial placeholder when page loads
 outputEl.textContent = "(logs will appear here)\n\n";
 
@@ -1016,7 +1022,9 @@ function render() {
     const isHover = n.id === hoverNodeId;
     const isLocked = n.id === lockedNodeId;
 
-    const r = isLocked ? 6 : isHover ? 5 : 3;
+    let r = NODE_RADIUS.base;
+    if (n.id === hoverNodeId) r = NODE_RADIUS.hover;
+    if (n.id === lockedNodeId) r = NODE_RADIUS.locked;
 
     // fill by bin (current mode)
     const b = nodeBin(n, filters.mode);
