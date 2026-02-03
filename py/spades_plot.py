@@ -16,23 +16,31 @@ import matplotlib.pyplot as plt
 from igraph import plot as ig_plot
 
 
+
+def colours_tab20_distinct_first(bins: int):
+    cmap = plt.get_cmap("tab20")
+    order = list(range(0, 20, 2)) + list(range(1, 20, 2))  # evens then odds
+    order = order[:min(bins, 20)]
+    return [mcolors.to_hex(cmap(i)) for i in order]
+
+
 def generate_distinct_colours(bins: int):
     if bins <= 0:
         return []
 
-    # High-quality categorical palettes first
     if bins <= 10:
-        cmap = plt.get_cmap("tab10", bins)
-        cols = [mcolors.to_hex(cmap(i)) for i in range(bins)]
-    elif bins <= 20:
-        cmap = plt.get_cmap("tab20", bins)
-        cols = [mcolors.to_hex(cmap(i)) for i in range(bins)]
-    else:
-        # Evenly spaced hues around the colour wheel (good for many bins)
-        hues = np.linspace(0, 1, bins, endpoint=False)
-        cols = [mcolors.to_hex(mcolors.hsv_to_rgb((h, 0.75, 0.95))) for h in hues]
+        cmap = plt.get_cmap("tab10")
+        return [mcolors.to_hex(cmap(i)) for i in range(bins)]
 
-    return cols
+    if bins <= 20:
+        cmap = plt.get_cmap("tab20")
+        order = list(range(0, 20, 2)) + list(range(1, 20, 2))
+        return [mcolors.to_hex(cmap(i)) for i in order[:bins]]
+
+    # fallback for many bins
+    hues = np.linspace(0, 1, bins, endpoint=False)
+    return [mcolors.to_hex(mcolors.hsv_to_rgb((h, 0.75, 0.95))) for h in hues]
+
 
 
 def draw_graph_with_matplotlib(graph, out_name, visual_style, dpi=300, width=2000, height=2000):
