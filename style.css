@@ -266,6 +266,22 @@ select:focus{
   overflow: hidden;
 }
 
+/* --- Mobile-safe interactive layout --- */
+@media (max-width: 900px) {
+  .interactive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .interactive-canvas-wrap {
+    min-height: 420px;   /* CRITICAL */
+  }
+
+  #graph-canvas {
+    height: 420px;       /* CRITICAL */
+    width: 100%;
+    touch-action: none;  /* allow custom gestures */
+  }
+}
 
 .tooltip{
   position: absolute;
@@ -398,3 +414,4 @@ select:focus{
   opacity: 0.5;
   cursor: not-allowed;
 }
+
