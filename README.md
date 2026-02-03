@@ -1,6 +1,7 @@
 # GraphBin `visualise` WASM
 
-A **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs, including both static plots and a fully interactive graph view.
+A **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs, including static plots, a fully interactive assembly graph view, and a Sankey diagram summarising contig reassignment between binning results.
+
 
 This project uses Pyodide (Python compiled to WebAssembly) to run `igraph`, GraphBin’s graph visualisation code, and the plotting code entirely in the browser — no backend needed.
 
@@ -43,6 +44,24 @@ No installation needed! Python **not required**. Node.js **not required**. You o
 * Toggle visibility of bins and contigs
 * Designed for exploratory analysis and quality assessment
 
+### Binning Comparison Sankey Diagram
+
+* Sankey diagram showing how contigs move between:
+  * Initial binning results
+  * GraphBin-refined binning results
+* Each flow represents the number of contigs transferred between bins
+* Unbinned contigs are shown explicitly (light grey) to highlight recovery or loss
+* Supports interactive exploration:
+  * Hover to inspect contig flow between specific bins
+  * Click to lock/highlight a bin-to-bin transition
+* Filters to:
+  * Show only contigs that changed bin
+  * Hide unbinned contigs
+* Automatically updates when new binning results are plotted
+
+This view provides a high-level summary of bin refinement behavior, complementing the detailed interactive assembly graph.
+
+
 ### General
 
 * Built-in test data for instant demonstration
@@ -56,6 +75,7 @@ No installation needed! Python **not required**. Node.js **not required**. You o
 * igraph (graph processing + plotting)
 * matplotlib (Pyodide backend) for static image generation
 * JavaScript (ES6) application logic
+* D3.js for interactive visualisation
 * HTML5/CSS3 user interface
 * [GraphBin plotting logic](https://github.com/metagentools/GraphBin/tree/develop/src/graphbin/support)
 
