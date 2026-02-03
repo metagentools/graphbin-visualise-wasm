@@ -1,4 +1,4 @@
-# GraphBin `visualise` WebAssembly App
+# GraphBin `visualise` WASM
 
 A **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs.
 
@@ -15,7 +15,7 @@ No installation needed! Python **not required**. Node.js **not required**. You o
 * Run GraphBin plotting fully in the browser using WebAssembly
 * Supports SPAdes assembler layout (GFA, contigs FASTA, contig paths). Support for MEGAHIT and Flye is coming soon.
 * Upload your initial binning + GraphBin binning results
-* Adjustable plot settings:
+* Adjustable plot settings: 1) DPI, 2) width, 3) height, 4) vertex size, 5) label size and 5) image size
 * Automatically renders two plots: 1) initial binning plot and 2) GraphBin-refined binning plot
 * Client-side file handling — your data never leaves your computer
 * Download generated plots
