@@ -84,8 +84,8 @@ This view provides a high-level summary of bin refinement behavior, complementin
 Clone the repository:
 
 ```shell
-git clone https://github.com/metagentools/graphbin-visualise-wasm-app.git
-cd graphbin-visualise-wasm-app
+git clone https://github.com/metagentools/graphbin-visualise-wasm.git
+cd graphbin-visualise-wasm
 ```
 
 Because the browser cannot fetch local files with `file:///`, you must serve it with a lightweight local server. You will need Python for this step.
