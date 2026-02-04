@@ -239,7 +239,7 @@ export default function App() {
           </div>
 
           <div className="interactive-canvas-wrap">
-            <canvas id="graph-canvas" width="900" height="700"></canvas>
+            <svg id="graph-svg" role="img" aria-label="Interactive assembly graph"></svg>
             <div id="hover-tooltip" className="tooltip" style={{ display: "none" }}></div>
           </div>
         </div>

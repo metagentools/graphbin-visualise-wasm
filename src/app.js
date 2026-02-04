@@ -29,13 +29,10 @@ let lastFinalImgPath = null;
    ========================= */
 let graphModel = null;
 
-let canvas = null;
-let ctx = null;
-
-// pan/zoom state
-let view = { tx: 0, ty: 0, scale: 1 };
-let dragging = false;
-let lastMouse = { x: 0, y: 0 };
+let graphSvg = null;
+let graphG = null;
+let zoomBehavior = null;
+let currentTransform = null;
 
 let hoverNodeId = null;
 let lockedNodeId = null;
@@ -53,9 +50,6 @@ let filters = {
   khopK: 0,
   collapseTips: false,
 };
-
-// spatial index (grid hash in world coords)
-let spatial = { cell: 20, map: new Map() };
 
 // bin -> color (stable palette per dataset)
 let binColorMap = new Map();
@@ -83,16 +77,18 @@ function resetInteractiveViews() {
 
   // Zoom / pan state (if used)
   window.currentTransform = null;
+  currentTransform = null;
 
   /* =============================
-   * Clear interactive canvas plot
+   * Clear interactive D3 plot
    * ============================= */
-  const canvas = document.getElementById("graph-canvas");
-  if (canvas) {
-    const ctx = canvas.getContext("2d");
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset zoom/pan
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const svg = document.getElementById("graph-svg");
+  if (svg) {
+    svg.replaceChildren();
   }
+  graphSvg = null;
+  graphG = null;
+  zoomBehavior = null;
 
   /* =============================
    * Clear bin legend
@@ -391,9 +387,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
 
     // Ensure first layout uses actual DOM sizes
     requestAnimationFrame(() => {
-      resizeCanvasToDisplaySize();
       fitToView(graphModel);
-      rebuildSpatialIndex();
       render();
       renderSankey();
     });
@@ -515,9 +509,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
     initSankeyUI();
 
     requestAnimationFrame(() => {
-      resizeCanvasToDisplaySize();
       fitToView(graphModel);
-      rebuildSpatialIndex();
       render();
       renderSankey();
     });
@@ -688,95 +680,35 @@ function makeLegendRow(label, color) {
 
 
 /* =========================
-   Interactive: UI + canvas
+   Interactive: UI + D3
    ========================= */
 function initInteractiveUI() {
-  const c = document.getElementById("graph-canvas");
-  if (!c) return; // interactive panel not present
+  const svgEl = document.getElementById("graph-svg");
+  if (!svgEl || !window.d3) return; // interactive panel not present
 
-  if (!canvas) {
-    canvas = c;
-    ctx = canvas.getContext("2d");
+  if (!graphSvg) {
+    graphSvg = svgEl;
+    const svg = d3.select(graphSvg);
+    svg.selectAll("*").remove();
+    graphG = svg.append("g").attr("class", "graph-layer");
 
-    // Resize on window resize
-    window.addEventListener("resize", () => {
-      if (!graphModel) return;
-      resizeCanvasToDisplaySize();
-      // keep view stable on resize: no fitToView here
-      rebuildSpatialIndex();
-      render();
-    });
+    zoomBehavior = d3
+      .zoom()
+      .scaleExtent([0.05, 20])
+      .on("zoom", (event) => {
+        currentTransform = event.transform;
+        graphG.attr("transform", currentTransform);
+      });
 
-    // Pointer interactions
-    canvas.addEventListener("mousedown", (e) => {
-      dragging = true;
-      lastMouse = { x: e.offsetX, y: e.offsetY };
-    });
+    svg.call(zoomBehavior);
 
-    window.addEventListener("mouseup", () => {
-      dragging = false;
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
-      const x = e.offsetX,
-        y = e.offsetY;
-
-      if (dragging) {
-        const dx = x - lastMouse.x;
-        const dy = y - lastMouse.y;
-        view.tx += dx;
-        view.ty += dy;
-        lastMouse = { x, y };
+    if (!svgEl.dataset._resizeBound) {
+      window.addEventListener("resize", () => {
+        if (!graphModel) return;
         render();
-        return;
-      }
-
-      hoverNodeId = pickNode(x, y);
-
-      const tooltip = document.getElementById("hover-tooltip");
-      if (tooltip) {
-        if (hoverNodeId) {
-          const n = getNode(hoverNodeId);
-          tooltip.style.display = "block";
-          tooltip.style.left = x + 12 + "px";
-          tooltip.style.top = y + 12 + "px";
-          tooltip.innerHTML = formatTooltip(n);
-        } else {
-          tooltip.style.display = "none";
-        }
-      }
-
-      render();
-    });
-
-    canvas.addEventListener("click", (e) => {
-      const nodeId = pickNode(e.offsetX, e.offsetY);
-      lockedNodeId = lockedNodeId === nodeId ? null : nodeId;
-      render();
-    });
-
-    canvas.addEventListener(
-      "wheel",
-      (e) => {
-        e.preventDefault();
-        const mouseX = e.offsetX;
-        const mouseY = e.offsetY;
-
-        const zoom = Math.exp(-e.deltaY * 0.001);
-        const oldScale = view.scale;
-        const newScale = clamp(oldScale * zoom, 0.05, 20);
-
-        const wx = (mouseX - view.tx) / oldScale;
-        const wy = (mouseY - view.ty) / oldScale;
-
-        view.scale = newScale;
-        view.tx = mouseX - wx * newScale;
-        view.ty = mouseY - wy * newScale;
-
-        render();
-      },
-      { passive: false }
-    );
+      });
+      svgEl.dataset._resizeBound = "1";
+    }
   }
 
   // Controls (attach once)
@@ -828,9 +760,7 @@ function initInteractiveUI() {
 
   attachControl("reset-view", "click", () => {
     if (!graphModel) return;
-    resizeCanvasToDisplaySize();
     fitToView(graphModel);
-    rebuildSpatialIndex();
     render();
   });
 
@@ -1051,22 +981,6 @@ function attachControl(id, event, handler) {
   el.dataset._bound = "1";
 }
 
-function resizeCanvasToDisplaySize() {
-  if (!canvas) return;
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  const w = Math.max(1, Math.floor(rect.width * dpr));
-  const h = Math.max(1, Math.floor(rect.height * dpr));
-  if (canvas.width !== w || canvas.height !== h) {
-    canvas.width = w;
-    canvas.height = h;
-  }
-  if (ctx) {
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(dpr, dpr); // draw using CSS pixel coords
-  }
-}
-
 function populateBinFilter() {
   const sel = document.getElementById("bin-filter");
   if (!sel || !graphModel) return;
@@ -1090,12 +1004,16 @@ function populateBinFilter() {
 /* =========================
    Interactive: math / view
    ========================= */
-function clamp(x, a, b) {
-  return Math.max(a, Math.min(b, x));
+function getSvgSize() {
+  if (!graphSvg) return { width: 900, height: 700 };
+  const rect = graphSvg.getBoundingClientRect();
+  const width = Math.max(1, rect.width || 900);
+  const height = Math.max(1, rect.height || 700);
+  return { width, height };
 }
 
 function fitToView(model) {
-  if (!canvas || !model) return;
+  if (!graphSvg || !model || !zoomBehavior || !window.d3) return;
 
   let minX = Infinity,
     minY = Infinity,
@@ -1113,79 +1031,18 @@ function fitToView(model) {
   const h = maxY - minY || 1;
 
   const padding = 40;
-  const cw = canvas.clientWidth || 900;
-  const ch = canvas.clientHeight || 700;
+  const { width, height } = getSvgSize();
 
-  const sx = (cw - padding * 2) / w;
-  const sy = (ch - padding * 2) / h;
+  const sx = (width - padding * 2) / w;
+  const sy = (height - padding * 2) / h;
   const s = Math.min(sx, sy);
 
-  view.scale = s;
-  view.tx = padding - minX * s;
-  view.ty = padding - minY * s;
-}
+  const tx = padding - minX * s;
+  const ty = padding - minY * s;
 
-function worldToScreen(x, y) {
-  return { x: x * view.scale + view.tx, y: y * view.scale + view.ty };
-}
-
-function screenToWorld(x, y) {
-  return { x: (x - view.tx) / view.scale, y: (y - view.ty) / view.scale };
-}
-
-/* =========================
-   Interactive: spatial index
-   ========================= */
-function rebuildSpatialIndex() {
-  if (!graphModel) return;
-  spatial.map.clear();
-  const cell = spatial.cell;
-
-  for (const n of graphModel.nodes) {
-    const cx = Math.floor(n.x / cell);
-    const cy = Math.floor(n.y / cell);
-    const key = cx + "," + cy;
-    if (!spatial.map.has(key)) spatial.map.set(key, []);
-    spatial.map.get(key).push(n.id);
-  }
-}
-
-function pickNode(screenX, screenY) {
-  if (!graphModel) return null;
-  const w = screenToWorld(screenX, screenY);
-
-  const rScreen = 8; // px
-  const rWorld = rScreen / view.scale;
-
-  const cell = spatial.cell;
-  const cx = Math.floor(w.x / cell);
-  const cy = Math.floor(w.y / cell);
-
-  let best = null;
-  let bestD2 = Infinity;
-
-  for (let dx = -1; dx <= 1; dx++) {
-    for (let dy = -1; dy <= 1; dy++) {
-      const key = cx + dx + "," + (cy + dy);
-      const list = spatial.map.get(key);
-      if (!list) continue;
-
-      for (const id of list) {
-        const n = getNode(id);
-        if (!isNodeVisible(n)) continue;
-
-        const ddx = n.x - w.x;
-        const ddy = n.y - w.y;
-        const d2 = ddx * ddx + ddy * ddy;
-
-        if (d2 < bestD2 && d2 <= rWorld * rWorld) {
-          bestD2 = d2;
-          best = id;
-        }
-      }
-    }
-  }
-  return best;
+  const t = d3.zoomIdentity.translate(tx, ty).scale(s);
+  d3.select(graphSvg).call(zoomBehavior.transform, t);
+  currentTransform = t;
 }
 
 /* =========================
@@ -1293,13 +1150,26 @@ function formatTooltip(n) {
   `;
 }
 
+function showTooltip(tooltip, wrap, event, n) {
+  if (!tooltip || !wrap) return;
+  const rect = wrap.getBoundingClientRect();
+  tooltip.style.display = "block";
+  tooltip.style.left = event.clientX - rect.left + 12 + "px";
+  tooltip.style.top = event.clientY - rect.top + 12 + "px";
+  tooltip.innerHTML = formatTooltip(n);
+}
+
+function hideTooltip(tooltip) {
+  if (!tooltip) return;
+  tooltip.style.display = "none";
+  tooltip.innerHTML = "";
+}
+
 /* =========================
    Interactive: drawing
    ========================= */
 function render() {
-  if (!graphModel || !canvas || !ctx) return;
-
-  resizeCanvasToDisplaySize();
+  if (!graphModel || !graphSvg || !graphG || !window.d3) return;
 
   // compute khop set if needed
   if (filters.khopFrom && filters.khopK >= 0) {
@@ -1317,78 +1187,94 @@ function render() {
     graphModel.khopSet = null;
   }
 
-  // clear in CSS pixel coords
-  const w = canvas.clientWidth || 900;
-  const h = canvas.clientHeight || 700;
-  ctx.clearRect(0, 0, w, h);
+  const { width, height } = getSvgSize();
+  const svg = d3.select(graphSvg);
+  svg.attr("viewBox", `0 0 ${width} ${height}`);
 
-  // edges
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.25;
-  ctx.strokeStyle = "#111827";
+  const visibleNodes = graphModel.nodes.filter((n) => isNodeVisible(n));
+  const visibleIds = new Set(visibleNodes.map((n) => n.id));
 
-  for (const [u, v] of graphModel.edges) {
-    const nu = getNode(u);
-    const nv = getNode(v);
-    if (!isNodeVisible(nu) || !isNodeVisible(nv)) continue;
+  if (hoverNodeId && !visibleIds.has(hoverNodeId)) hoverNodeId = null;
+  if (lockedNodeId && !visibleIds.has(lockedNodeId)) lockedNodeId = null;
 
-    const a = worldToScreen(nu.x, nu.y);
-    const b = worldToScreen(nv.x, nv.y);
+  const edgeData = graphModel.edges
+    .map(([u, v]) => ({ u, v }))
+    .filter((e) => visibleIds.has(e.u) && visibleIds.has(e.v));
 
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
-  }
+  const edgeSel = graphG
+    .selectAll("line.edge")
+    .data(edgeData, (d) => `${d.u}->${d.v}`);
 
-  // nodes
-  ctx.globalAlpha = 1.0;
+  edgeSel
+    .enter()
+    .append("line")
+    .attr("class", "edge")
+    .attr("stroke", "#111827")
+    .attr("stroke-opacity", 0.25)
+    .attr("stroke-width", 1)
+    .merge(edgeSel)
+    .attr("x1", (d) => getNode(d.u).x)
+    .attr("y1", (d) => getNode(d.u).y)
+    .attr("x2", (d) => getNode(d.v).x)
+    .attr("y2", (d) => getNode(d.v).y);
 
-  for (const n of graphModel.nodes) {
-    if (!isNodeVisible(n)) continue;
+  edgeSel.exit().remove();
 
-    const p = worldToScreen(n.x, n.y);
-    const isHover = n.id === hoverNodeId;
-    const isLocked = n.id === lockedNodeId;
+  const tooltip = document.getElementById("hover-tooltip");
+  const wrap = graphSvg.parentElement;
 
-    let r = NODE_RADIUS.base;
-    if (n.id === hoverNodeId) r = NODE_RADIUS.hover;
-    if (n.id === lockedNodeId) r = NODE_RADIUS.locked;
+  const nodeSel = graphG
+    .selectAll("circle.node")
+    .data(visibleNodes, (d) => d.id);
 
-    // fill by bin (current mode)
-    const b = nodeBin(n, filters.mode);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = colorForBin(b);
-    ctx.fill();
+  nodeSel
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .style("cursor", "pointer")
+    .on("mouseenter", (event, d) => {
+      hoverNodeId = d.id;
+      showTooltip(tooltip, wrap, event, d);
+      render();
+    })
+    .on("mousemove", (event, d) => {
+      showTooltip(tooltip, wrap, event, d);
+    })
+    .on("mouseleave", () => {
+      hoverNodeId = null;
+      hideTooltip(tooltip);
+      render();
+    })
+    .on("click", (event, d) => {
+      event.stopPropagation();
+      lockedNodeId = lockedNodeId === d.id ? null : d.id;
+      render();
+    })
+    .merge(nodeSel)
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+    .attr("r", (d) => {
+      if (d.id === lockedNodeId) return NODE_RADIUS.locked;
+      if (d.id === hoverNodeId) return NODE_RADIUS.hover;
+      return NODE_RADIUS.base;
+    })
+    .attr("fill", (d) => colorForBin(nodeBin(d, filters.mode)))
+    .attr("stroke", (d) => {
+      if (d.id === lockedNodeId) return "#2563eb";
+      if (d.id === hoverNodeId) return "#111827";
+      if (d.changed) return "#000000";
+      const b = nodeBin(d, filters.mode);
+      return b ? "rgba(0,0,0,0.15)" : "#9ca3af";
+    })
+    .attr("stroke-width", (d) => {
+      if (d.id === lockedNodeId) return 3;
+      if (d.id === hoverNodeId) return 2;
+      if (d.changed) return 3;
+      const b = nodeBin(d, filters.mode);
+      return b ? 0.8 : 1.2;
+    });
 
-    if (!b) { // unbinned
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "#9ca3af";
-      ctx.stroke();
-    }
-
-    // changed ring (keep bin colour visible)
-    if (n.changed) {
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "#ffffff";
-      ctx.stroke();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#000000";
-      ctx.stroke();
-    }
-
-    // hover/locked outline
-    if (isLocked) {
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#2563eb";
-      ctx.stroke();
-    } else if (isHover) {
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "#111827";
-      ctx.stroke();
-    }
-  }
+  nodeSel.exit().remove();
 }
 
 }

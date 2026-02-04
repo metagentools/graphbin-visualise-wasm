@@ -254,11 +254,12 @@ select:focus{
 }
 
 /* Make canvas fill the wrapper without exceeding it */
-#graph-canvas{
+#graph-svg{
   display: block;
   width: 100%;
   height: 720px;              /* or whatever you want */
   max-width: 100%;
+  touch-action: none;
 }
 
 /* Optional: keep controls column stable */
@@ -276,7 +277,7 @@ select:focus{
     min-height: 420px;   /* CRITICAL */
   }
 
-  #graph-canvas {
+  #graph-svg {
     height: 420px;       /* CRITICAL */
     width: 100%;
     touch-action: none;  /* allow custom gestures */
