@@ -121,6 +121,18 @@ function resetInteractiveViews() {
     sankeyTooltip.innerHTML = "";
   }
 
+  // Only contigs that changed bin → unchecked
+  const sankeyOnlyChanged = document.getElementById("sankey-only-changed");
+  if (sankeyOnlyChanged) {
+    sankeyOnlyChanged.checked = false;
+  }
+
+  // Hide unbinned → unchecked
+  const sankeyHideUnbinned = document.getElementById("sankey-hide-unbinned");
+  if (sankeyHideUnbinned) {
+    sankeyHideUnbinned.checked = false;
+  }
+
   /* =============================
    * Reset controls to defaults
    * ============================= */
