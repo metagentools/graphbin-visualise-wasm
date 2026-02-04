@@ -1,3 +1,7 @@
+export function initApp() {
+  if (window.__graphbinAppInitialized) return;
+  window.__graphbinAppInitialized = true;
+
 const outputEl = document.getElementById("output");
 
 const NODE_RADIUS = {
@@ -1385,4 +1389,6 @@ function render() {
       ctx.stroke();
     }
   }
+}
+
 }
