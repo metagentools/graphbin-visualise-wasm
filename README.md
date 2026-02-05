@@ -74,8 +74,11 @@ This view provides a high-level summary of bin refinement behavior, complementin
 * Pyodide (Python → WebAssembly)
 * igraph (graph processing + plotting)
 * matplotlib (Pyodide backend) for static image generation
+* React (UI framework)
+* Vite (build tooling)
 * JavaScript (ES6) application logic
-* D3.js for interactive visualisation
+* D3.js (Sankey + zoom interactions)
+* Canvas API (interactive network rendering)
 * HTML5/CSS3 user interface
 * [GraphBin plotting logic](https://github.com/metagentools/GraphBin/tree/develop/src/graphbin/support)
 
