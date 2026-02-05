@@ -1,62 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
 /* Base layout */
 :root{
-  --bg: #f5f5f7;
+  --bg: #f6f7fb;
   --panel: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --border: #d1d5db;
-  --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-  --radius: 12px;
-  --focus: rgba(37, 99, 235, 0.35);
+  --text: #0f172a;
+  --muted: #5b6476;
+  --border: #e2e8f0;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  --radius: 14px;
+  --focus: rgba(59, 130, 246, 0.3);
+  --accent: #2563eb;
+  --accent-2: #0ea5e9;
 }
 
 *{ box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--bg);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(900px 500px at 10% -10%, rgba(14,165,233,0.12), transparent 60%),
+              radial-gradient(900px 600px at 110% 0%, rgba(37,99,235,0.18), transparent 55%),
+              var(--bg);
+  font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
 }
 
 .app {
-  max-width: 1200px;
+  max-width: 1220px;
   margin: 0 auto;
-  padding: 24px 16px 40px;
+  padding: 28px 18px 52px;
 }
 
 /* Header */
 .app-header h1 {
-  margin: 0 0 4px;
-  font-size: 2rem;
-  font-weight: 750;
+  margin: 0 0 6px;
+  font-size: 2.2rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
+  font-family: "Space Grotesk", system-ui, sans-serif;
 }
 
 .subtitle {
   margin: 0 0 24px;
-  color: #000000;
-  font-size: 0.95rem;
-  line-height: 1.35;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.5;
 }
 
 /* Generic panel / card */
 .panel {
   background: var(--panel);
   border-radius: var(--radius);
-  padding: 20px 24px 24px;
+  padding: 22px 24px 26px;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   margin-bottom: 24px;
 }
 
 .panel h2 {
   margin: 0 0 12px;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 600;
 }
 
 .panel h3 {
   margin: 0 0 12px;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 600;
+  color: #1f2937;
+  font-family: "Space Grotesk", system-ui, sans-serif;
 }
 
 /* Two-column layout for config */
@@ -98,7 +110,7 @@ body {
 label{
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text);
+  color: #1f2937;
   line-height: 1.2;
 }
 
@@ -106,23 +118,24 @@ label{
 input,
 select{
   width: 100%;
-  height: 38px;
-  padding: 8px 10px;
-  font-size: 0.92rem;
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
+  border-radius: 10px;
+  background: #ffffff;
   outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 input[type="file"]{
   padding: 6px 10px;
-  height: 40px;
+  height: 42px;
 }
 
 input:focus,
 select:focus{
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--focus);
 }
 
@@ -137,40 +150,31 @@ select:focus{
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 9px 16px;
-  font-size: 0.92rem;
+  padding: 10px 18px;
+  font-size: 0.95rem;
   cursor: pointer;
   font-weight: 600;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease,
-    box-shadow 0.15s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn.primary {
-  background: #2563eb;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   color: #ffffff;
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.28);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
 }
 
 .btn.primary:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .btn.secondary {
-  background: #e5e7eb;
-  color: #111827;
+  background: #eef2f7;
+  color: #1f2937;
 }
 
 .btn.secondary:hover {
-  background: #d1d5db;
-}
-
-#reset-view {
-  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.12);
-}
-
-#reset-view:hover {
-  transform: translateY(-1px);
+  background: #e2e8f0;
 }
 
 .btn.tertiary {
@@ -180,6 +184,20 @@ select:focus{
 
 .btn.tertiary:hover {
   background: #e5e7eb;
+}
+
+#reset-view,
+#example-btn,
+#download-initial,
+#download-final {
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.12);
+}
+
+#reset-view:hover,
+#example-btn:hover,
+#download-initial:hover,
+#download-final:hover {
+  transform: translateY(-1px);
 }
 
 /* Plots row */
@@ -202,7 +220,7 @@ select:focus{
 .plot-block img {
   max-width: 100%;
   height: auto;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border);
 }
 
@@ -236,10 +254,7 @@ select:focus{
   }
 }
 
-
 /* Interactive view */
-
-/* Interactive view layout: prevent overlap */
 .interactive-grid{
   display: grid;
   grid-template-columns: 340px 1fr;
@@ -247,7 +262,6 @@ select:focus{
   align-items: start;
 }
 
-/* CRITICAL: allow grid children to shrink; prevents overflow overlap */
 .interactive-controls,
 .interactive-canvas-wrap{
   min-width: 0;
@@ -256,12 +270,11 @@ select:focus{
 .interactive-canvas-wrap{
   position: relative;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;           /* keep drawing inside the panel */
   background: #ffffff;
 }
 
-/* Make canvas fill the wrapper without exceeding it */
 #graph-canvas{
   display: block;
   width: 100%;
@@ -270,12 +283,10 @@ select:focus{
   touch-action: none;
 }
 
-/* Optional: keep controls column stable */
 .interactive-controls{
   overflow: hidden;
 }
 
-/* --- Mobile-safe interactive layout --- */
 @media (max-width: 900px) {
   .interactive-grid {
     grid-template-columns: 1fr;
@@ -331,8 +342,8 @@ select:focus{
 .sankey-wrap{
   position: relative;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: #fff;
+  border-radius: 14px;
+  background: #ffffff;
   overflow: hidden;
 }
 
