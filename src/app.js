@@ -5,9 +5,9 @@ export function initApp() {
 const outputEl = document.getElementById("output");
 
 const NODE_RADIUS = {
-  base: 4.5,     // default node radius (was ~3)
-  hover: 6.5,    // on hover
-  locked: 7.5,   // on click
+  base: 5.5,     // default node radius
+  hover: 7.5,    // on hover
+  locked: 8.5,   // on click
 };
 
 // Initial placeholder when page loads
@@ -701,7 +701,7 @@ function initInteractiveUI() {
 
     zoomBehavior = d3
       .zoom()
-      .scaleExtent([0.05, 20])
+      .scaleExtent([0.05, 60])
       .on("zoom", (event) => {
         currentTransform = event.transform;
         render();
