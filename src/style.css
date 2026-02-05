@@ -165,6 +165,14 @@ select:focus{
   background: #d1d5db;
 }
 
+#reset-view {
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.12);
+}
+
+#reset-view:hover {
+  transform: translateY(-1px);
+}
+
 .btn.tertiary {
   background: #f3f4f6;
   color: #111827;
@@ -254,7 +262,7 @@ select:focus{
 }
 
 /* Make canvas fill the wrapper without exceeding it */
-#graph-svg{
+#graph-canvas{
   display: block;
   width: 100%;
   height: 720px;              /* or whatever you want */
@@ -277,7 +285,7 @@ select:focus{
     min-height: 420px;   /* CRITICAL */
   }
 
-  #graph-svg {
+  #graph-canvas {
     height: 420px;       /* CRITICAL */
     width: 100%;
     touch-action: none;  /* allow custom gestures */
