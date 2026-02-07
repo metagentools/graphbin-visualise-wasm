@@ -4,10 +4,80 @@ import { initApp } from "./app.js";
 export default function App() {
   useEffect(() => {
     initApp();
+
+    const root = document.documentElement;
+    const toggleButton = document.getElementById("theme-toggle");
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const storageKey = "graphbin-theme";
+
+    const getSystemTheme = () => (media.matches ? "dark" : "light");
+
+    const applyTheme = (theme) => {
+      root.dataset.theme = theme;
+      root.style.colorScheme = theme;
+
+      if (toggleButton) {
+        toggleButton.setAttribute(
+          "aria-label",
+          theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+        );
+        toggleButton.setAttribute("aria-pressed", theme === "dark");
+      }
+    };
+
+    const storedTheme = localStorage.getItem(storageKey);
+    applyTheme(storedTheme || getSystemTheme());
+
+    const handleToggle = () => {
+      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+      localStorage.setItem(storageKey, nextTheme);
+      applyTheme(nextTheme);
+    };
+
+    const handleSystemChange = () => {
+      if (!localStorage.getItem(storageKey)) {
+        applyTheme(getSystemTheme());
+      }
+    };
+
+    if (toggleButton) {
+      toggleButton.addEventListener("click", handleToggle);
+    }
+
+    if (media.addEventListener) {
+      media.addEventListener("change", handleSystemChange);
+    } else {
+      media.addListener(handleSystemChange);
+    }
+
+    return () => {
+      if (toggleButton) {
+        toggleButton.removeEventListener("click", handleToggle);
+      }
+      if (media.removeEventListener) {
+        media.removeEventListener("change", handleSystemChange);
+      } else {
+        media.removeListener(handleSystemChange);
+      }
+    };
   }, []);
 
   return (
     <div className="app">
+      <button
+        id="theme-toggle"
+        className="theme-toggle"
+        type="button"
+        aria-label="Switch to dark mode"
+        aria-pressed="false"
+      >
+        <svg className="icon sun" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 4.5a1 1 0 0 1 1 1V7a1 1 0 1 1-2 0V5.5a1 1 0 0 1 1-1Zm0 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7.5-3.5a1 1 0 0 1 1 1v.1a1 1 0 0 1-1 1h-1.4a1 1 0 1 1 0-2h1.4ZM5.9 12a1 1 0 0 1-1 1H3.5a1 1 0 1 1 0-2h1.4a1 1 0 0 1 1 1Zm10.25-5.6a1 1 0 0 1 1.4 0l1 1a1 1 0 0 1-1.4 1.4l-1-1a1 1 0 0 1 0-1.4ZM6.45 16.3a1 1 0 0 1 1.4 0l1 1a1 1 0 0 1-1.4 1.4l-1-1a1 1 0 0 1 0-1.4ZM18.55 16.3a1 1 0 0 1 0 1.4l-1 1a1 1 0 1 1-1.4-1.4l1-1a1 1 0 0 1 1.4 0ZM7.85 5.1a1 1 0 0 1 0 1.4l-1 1A1 1 0 1 1 5.45 6.1l1-1a1 1 0 0 1 1.4 0Z" />
+        </svg>
+        <svg className="icon moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.2 15.3a8.2 8.2 0 0 1-11.5-11 1 1 0 0 0-1.5-1.1 10 10 0 1 0 14.1 13.9 1 1 0 0 0-1.1-1.8Z" />
+        </svg>
+      </button>
       <header className="app-header">
         <h1>GraphBin Visualise Wasm</h1>
         <p className="subtitle">
