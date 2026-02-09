@@ -34,6 +34,16 @@ export default function App() {
       applyTheme(nextTheme);
     };
 
+    const handleDocClick = (event) => {
+      const target = event.target;
+      if (target && target.closest && target.closest("details.help")) {
+        return;
+      }
+      document.querySelectorAll("details.help[open]").forEach((detail) => {
+        detail.open = false;
+      });
+    };
+
     const handleSystemChange = () => {
       if (!localStorage.getItem(storageKey)) {
         applyTheme(getSystemTheme());
@@ -43,6 +53,8 @@ export default function App() {
     if (toggleButton) {
       toggleButton.addEventListener("click", handleToggle);
     }
+
+    document.addEventListener("click", handleDocClick);
 
     if (media.addEventListener) {
       media.addEventListener("change", handleSystemChange);
@@ -54,6 +66,7 @@ export default function App() {
       if (toggleButton) {
         toggleButton.removeEventListener("click", handleToggle);
       }
+      document.removeEventListener("click", handleDocClick);
       if (media.removeEventListener) {
         media.removeEventListener("change", handleSystemChange);
       } else {
@@ -82,9 +95,10 @@ export default function App() {
         <h1>GraphBin Visualise Wasm</h1>
         <p className="subtitle">
           Visualise and compare metagenomic binning results and improved binning
-          results from GraphBin directly in your browser.
+          results from GraphBin (or a similar bin-improvement tool) directly in your browser.
           <br />
-          You can load your own data and click <b>Plot binning results</b>, or
+          You can load your own data (click on the tooltips for more information about the files 
+          to be uploaded) and click <b>Plot binning results</b>, or
           click <b>Run example data</b> to see how it works on the example data
           provided.
         </p>
@@ -97,7 +111,15 @@ export default function App() {
 
             <div className="form-grid">
               <div className="form-row">
-                <label htmlFor="assembler">Assembler</label>
+                <div className="label-with-help">
+                  <label htmlFor="assembler">Assembler</label>
+                  <details className="help" role="group">
+                    <summary aria-label="Assembler help">?</summary>
+                    <span className="help-tooltip" role="tooltip">
+                      The assembler used to assemble your metagenomic sample
+                    </span>
+                  </details>
+                </div>
                 <div className="control">
                   <select id="assembler" defaultValue="spades">
                     <option value="spades">SPAdes</option>
@@ -106,42 +128,93 @@ export default function App() {
               </div>
 
               <div className="form-row">
-                <label htmlFor="graph">GFA file</label>
+                <div className="label-with-help">
+                  <label htmlFor="graph">GFA file</label>
+                  <details className="help" role="group">
+                    <summary aria-label="GFA file help">?</summary>
+                    <span className="help-tooltip" role="tooltip">
+                      The GFA file output from the assembler
+                    </span>
+                  </details>
+                </div>
                 <div className="control">
                   <input id="graph" type="file" />
                 </div>
               </div>
 
               <div className="form-row">
-                <label htmlFor="contigs">Contigs file</label>
+                <div className="label-with-help">
+                  <label htmlFor="contigs">Contigs file</label>
+                  <details className="help" role="group">
+                    <summary aria-label="Contigs file help">?</summary>
+                    <span className="help-tooltip" role="tooltip">
+                      The contigs file (e.g., contigs.fasta from SPAdes)
+                    </span>
+                  </details>
+                </div>
                 <div className="control">
                   <input id="contigs" type="file" />
                 </div>
               </div>
 
               <div className="form-row">
-                <label htmlFor="paths">Paths file</label>
+                <div className="label-with-help">
+                  <label htmlFor="paths">Paths file</label>
+                  <details className="help" role="group">
+                    <summary aria-label="Paths file help">?</summary>
+                    <span className="help-tooltip" role="tooltip">
+                      The paths file of the contigs (e.g., contigs.paths from SPAdes)
+                    </span>
+                  </details>
+                </div>
                 <div className="control">
                   <input id="paths" type="file" />
                 </div>
               </div>
 
               <div className="form-row">
-                <label htmlFor="initial">Initial binning result</label>
+                <div className="label-with-help">
+                  <label htmlFor="initial">Initial binning result</label>
+                  <details className="help" role="group">
+                    <summary aria-label="Initial binning result help">?</summary>
+                    <span className="help-tooltip" role="tooltip">
+                      The binning result from any existing metagenomic binning
+                      tool in CSV or TSV format (contig name, bin ID)
+                    </span>
+                  </details>
+                </div>
                 <div className="control">
                   <input id="initial" type="file" />
                 </div>
               </div>
 
               <div className="form-row">
-                <label htmlFor="graphbin">GraphBin result</label>
+                <div className="label-with-help">
+                  <label htmlFor="graphbin">GraphBin result</label>
+                  <details className="help" role="group">
+                    <summary aria-label="GraphBin result help">?</summary>
+                    <span className="help-tooltip" role="tooltip">
+                      Improved binning result from GraphBin or similar
+                      bin-improvement tool in CSV or TSV format. Currently
+                      supports same bin names as the initial binning result.
+                    </span>
+                  </details>
+                </div>
                 <div className="control">
                   <input id="graphbin" type="file" />
                 </div>
               </div>
 
               <div className="form-row">
-                <label htmlFor="setting-delimiter">Delimiter </label>
+                <div className="label-with-help">
+                  <label htmlFor="setting-delimiter">Delimiter</label>
+                  <details className="help" role="group">
+                    <summary aria-label="Delimiter help">?</summary>
+                    <span className="help-tooltip" role="tooltip">
+                      Delimiter used in the binning results
+                    </span>
+                  </details>
+                </div>
                 <div className="control">
                   <select id="setting-delimiter" defaultValue=",">
                     <option value=",">Comma (,)</option>
