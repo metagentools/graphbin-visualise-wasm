@@ -107,7 +107,8 @@ export default function App() {
         <h1>GraphBin Visualise Wasm</h1>
         <p className="subtitle">
           Visualise and compare metagenomic binning results and improved binning
-          results from GraphBin (or a similar bin-improvement tool) directly in your browser.
+          results from GraphBin (or a similar bin-improvement tool) directly in your browser. 
+          All processing happens locally on your device, and no data ever leaves it.
           <br />
           You can load your own data (click on the tooltips for more information about the files 
           to be uploaded) and click <b>Plot binning results</b>, or
@@ -145,7 +146,7 @@ export default function App() {
                   <details className="help" role="group">
                     <summary aria-label="GFA file help">?</summary>
                     <span className="help-tooltip" role="tooltip">
-                      The GFA file output from the assembler
+                      The GFA file output from the assembler (&lt; 200 MB)
                     </span>
                   </details>
                 </div>
@@ -160,7 +161,7 @@ export default function App() {
                   <details className="help" role="group">
                     <summary aria-label="Contigs file help">?</summary>
                     <span className="help-tooltip" role="tooltip">
-                      The contigs file (e.g., contigs.fasta from SPAdes)
+                      The contigs file (e.g., contigs.fasta from SPAdes)  (&lt; 200 MB)
                     </span>
                   </details>
                 </div>
