@@ -499,6 +499,18 @@ export default function App() {
           </div>
         </div>
       </section>
+
+      <footer className="app-footer">
+        Made by{" "}
+        <a
+          href="https://vijinimallawaarachchi.com/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Vijini M
+        </a>{" "}
+        @ Flinders University
+      </footer>
     </div>
   );
 }

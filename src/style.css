@@ -88,6 +88,32 @@ body {
   position: relative;
 }
 
+.app-footer{
+  margin-top: 28px;
+  padding: 14px 0 4px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.app-footer a{
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.app-footer a:hover{
+  color: var(--accent);
+  border-color: rgba(14, 165, 233, 0.6);
+}
+
+.app-footer a:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+  border-radius: 6px;
+}
+
 .theme-toggle{
   position: fixed;
   top: 18px;
