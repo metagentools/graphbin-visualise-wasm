@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { initApp } from "./app.js";
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState("output");
+
   useEffect(() => {
     initApp();
 
@@ -74,6 +76,16 @@ export default function App() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (activeTab === "output") {
+      return;
+    }
+    const frame = requestAnimationFrame(() => {
+      window.dispatchEvent(new Event("resize"));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeTab]);
 
   return (
     <div className="app">
@@ -288,144 +300,203 @@ export default function App() {
         </div>
       </section>
 
-      <section className="panel">
-        <h2>Output</h2>
-        <div id="output">(logs will appear here)</div>
-      </section>
-
-      <section className="panel">
-        <h2>Plots</h2>
-        <div id="plots-row">
-          <div className="plot-block" id="initial-block" style={{ display: "none" }}>
-            <img id="initial-img" alt="Initial binning plot" />
-            <button id="download-initial" className="btn tertiary">
-              Download initial binning result plot
+      <section className="panel tab-shell">
+        <div className="tab-header">
+          <div className="tab-buttons" role="tablist" aria-label="Views">
+            <button
+              id="tab-output"
+              className={`tab-btn ${activeTab === "output" ? "active" : ""}`}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "output"}
+              aria-controls="panel-output"
+              onClick={() => setActiveTab("output")}
+            >
+              Output + Plots
             </button>
-          </div>
-
-          <div className="plot-block" id="final-block" style={{ display: "none" }}>
-            <img id="final-img" alt="GraphBin binning plot" />
-            <button id="download-final" className="btn tertiary">
-              Download GraphBin binning result plot
+            <button
+              id="tab-interactive"
+              className={`tab-btn ${activeTab === "interactive" ? "active" : ""}`}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "interactive"}
+              aria-controls="panel-interactive"
+              onClick={() => setActiveTab("interactive")}
+            >
+              Interactive View
+            </button>
+            <button
+              id="tab-flow"
+              className={`tab-btn ${activeTab === "flow" ? "active" : ""}`}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "flow"}
+              aria-controls="panel-flow"
+              onClick={() => setActiveTab("flow")}
+            >
+              Contig Flow
             </button>
           </div>
         </div>
-      </section>
 
-      <section className="panel">
-        <h2>Interactive View</h2>
+        <div className="tab-panels">
+          <div
+            id="panel-output"
+            className={`tab-panel ${activeTab === "output" ? "active" : ""}`}
+            role="tabpanel"
+            aria-labelledby="tab-output"
+          >
+            <div className="tab-section">
+              <h2>Output</h2>
+              <div id="output">(logs will appear here)</div>
+            </div>
 
-        <div className="interactive-grid">
-          <div className="interactive-controls">
-            <div className="form-grid">
-              <div className="form-row">
-                <label htmlFor="view-mode">Binning to display</label>
-                <div className="control">
-                  <select id="view-mode" defaultValue="final">
-                    <option value="initial">Initial</option>
-                    <option value="final">GraphBin</option>
-                  </select>
+            <div className="tab-section">
+              <h2>Plots</h2>
+              <div id="plots-row">
+                <div className="plot-block" id="initial-block" style={{ display: "none" }}>
+                  <img id="initial-img" alt="Initial binning plot" />
+                  <button id="download-initial" className="btn tertiary">
+                    Download initial binning result plot
+                  </button>
                 </div>
-              </div>
 
-              <div className="form-row">
-                <label htmlFor="bin-filter">Show only bin</label>
-                <div className="control">
-                  <select id="bin-filter">
-                    <option value="">(all bins)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <label htmlFor="toggle-hide-unbinned">Hide unbinned</label>
-                <div className="control">
-                  <label className="cb">
-                    <input id="toggle-hide-unbinned" type="checkbox" />
-                    <span className="cb-box" aria-hidden="true"></span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <label htmlFor="toggle-only-changed">Show only changed</label>
-                <div className="control">
-                  <label className="cb">
-                    <input id="toggle-only-changed" type="checkbox" />
-                    <span className="cb-box" aria-hidden="true"></span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <label></label>
-                <div className="control">
-                  <button id="reset-view" className="btn secondary">
-                    Reset view
+                <div className="plot-block" id="final-block" style={{ display: "none" }}>
+                  <img id="final-img" alt="GraphBin binning plot" />
+                  <button id="download-final" className="btn tertiary">
+                    Download GraphBin binning result plot
                   </button>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="legend-hint">
-              <div>
-                <b>Controls</b>
+          <div
+            id="panel-interactive"
+            className={`tab-panel ${activeTab === "interactive" ? "active" : ""}`}
+            role="tabpanel"
+            aria-labelledby="tab-interactive"
+          >
+            <h2>Interactive View</h2>
+
+            <div className="interactive-grid">
+              <div className="interactive-controls">
+                <div className="form-grid">
+                  <div className="form-row">
+                    <label htmlFor="view-mode">Binning to display</label>
+                    <div className="control">
+                      <select id="view-mode" defaultValue="final">
+                        <option value="initial">Initial</option>
+                        <option value="final">GraphBin</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <label htmlFor="bin-filter">Show only bin</label>
+                    <div className="control">
+                      <select id="bin-filter">
+                        <option value="">(all bins)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <label htmlFor="toggle-hide-unbinned">Hide unbinned</label>
+                    <div className="control">
+                      <label className="cb">
+                        <input id="toggle-hide-unbinned" type="checkbox" />
+                        <span className="cb-box" aria-hidden="true"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <label htmlFor="toggle-only-changed">Show only changed</label>
+                    <div className="control">
+                      <label className="cb">
+                        <input id="toggle-only-changed" type="checkbox" />
+                        <span className="cb-box" aria-hidden="true"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <label></label>
+                    <div className="control">
+                      <button id="reset-view" className="btn secondary">
+                        Reset view
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="legend-hint">
+                  <div>
+                    <b>Controls</b>
+                  </div>
+                  <div>Wheel: zoom</div>
+                  <div>Drag: pan</div>
+                  <div>Hover: tooltip</div>
+                  <div>Click: lock selection</div>
+                </div>
+
+                <div className="legend-title">Bin legend</div>
+                <div id="bin-legend" className="bin-legend"></div>
               </div>
-              <div>Wheel: zoom</div>
-              <div>Drag: pan</div>
-              <div>Hover: tooltip</div>
-              <div>Click: lock selection</div>
-            </div>
 
-            <div className="legend-title">Bin legend</div>
-            <div id="bin-legend" className="bin-legend"></div>
-          </div>
-
-          <div className="interactive-canvas-wrap">
-            <canvas id="graph-canvas" width="900" height="700"></canvas>
-            <div id="hover-tooltip" className="tooltip" style={{ display: "none" }}></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="panel">
-        <h2>Contig flow between binnings</h2>
-
-        <div className="sankey-controls">
-          <div className="sankey-controls-left">
-            <label className="cb">
-              <input id="sankey-only-changed" type="checkbox" />
-              <span className="cb-box" aria-hidden="true"></span>
-              <span className="cb-text">Only contigs that changed bin</span>
-            </label>
-
-            <label className="cb">
-              <input id="sankey-hide-unbinned" type="checkbox" />
-              <span className="cb-box" aria-hidden="true"></span>
-              <span className="cb-text">Hide unbinned</span>
-            </label>
-          </div>
-
-          <div className="sankey-controls-right">
-            <div className="sankey-hint">Click a flow to highlight it.</div>
-          </div>
-        </div>
-
-        <div className="sankey-wrap">
-          <div className="sankey-title-row">
-            <div id="sankey-left-title" className="sankey-title">
-              Binning 1
-            </div>
-            <div id="sankey-right-title" className="sankey-title">
-              Binning 2
+              <div className="interactive-canvas-wrap">
+                <canvas id="graph-canvas" width="900" height="700"></canvas>
+                <div id="hover-tooltip" className="tooltip" style={{ display: "none" }}></div>
+              </div>
             </div>
           </div>
-          <svg
-            id="sankey-svg"
-            role="img"
-            aria-label="Sankey diagram showing contig bin changes"
-          ></svg>
-          <div id="sankey-tooltip" className="tooltip" style={{ display: "none" }}></div>
+
+          <div
+            id="panel-flow"
+            className={`tab-panel ${activeTab === "flow" ? "active" : ""}`}
+            role="tabpanel"
+            aria-labelledby="tab-flow"
+          >
+            <h2>Contig flow between binnings</h2>
+
+            <div className="sankey-controls">
+              <div className="sankey-controls-left">
+                <label className="cb">
+                  <input id="sankey-only-changed" type="checkbox" />
+                  <span className="cb-box" aria-hidden="true"></span>
+                  <span className="cb-text">Only contigs that changed bin</span>
+                </label>
+
+                <label className="cb">
+                  <input id="sankey-hide-unbinned" type="checkbox" />
+                  <span className="cb-box" aria-hidden="true"></span>
+                  <span className="cb-text">Hide unbinned</span>
+                </label>
+              </div>
+
+              <div className="sankey-controls-right">
+                <div className="sankey-hint">Click a flow to highlight it.</div>
+              </div>
+            </div>
+
+            <div className="sankey-wrap">
+              <div className="sankey-title-row">
+                <div id="sankey-left-title" className="sankey-title">
+                  Binning 1
+                </div>
+                <div id="sankey-right-title" className="sankey-title">
+                  Binning 2
+                </div>
+              </div>
+              <svg
+                id="sankey-svg"
+                role="img"
+                aria-label="Sankey diagram showing contig bin changes"
+              ></svg>
+              <div id="sankey-tooltip" className="tooltip" style={{ display: "none" }}></div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
