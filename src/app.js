@@ -177,18 +177,18 @@ function resetInteractiveViews() {
    ========================= */
 document.getElementById("graph").addEventListener("change", function () {
   const file = this.files[0];
-  const MAX_SIZE = 500 * 1024 * 1024; // 500MB
+  const MAX_SIZE = 200 * 1024 * 1024; // 200MB
   if (file && file.size > MAX_SIZE) {
-    alert("GFA file is too large! Maximum allowed size is 500 MB.");
+    alert("GFA file is too large! Maximum allowed size is 200 MB.");
     this.value = "";
   }
 });
 
 document.getElementById("contigs").addEventListener("change", function () {
   const file = this.files[0];
-  const MAX_SIZE = 500 * 1024 * 1024; // 500MB
+  const MAX_SIZE = 200 * 1024 * 1024; // 200MB
   if (file && file.size > MAX_SIZE) {
-    alert("Contigs file is too large! Maximum allowed size is 500 MB.");
+    alert("Contigs file is too large! Maximum allowed size is 200 MB.");
     this.value = "";
   }
 });
