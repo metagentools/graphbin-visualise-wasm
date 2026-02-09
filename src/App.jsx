@@ -292,10 +292,20 @@ export default function App() {
         </div>
 
         <div className="button-row">
-          <button id="run-btn" className="btn primary">
+          <button
+            id="run-btn"
+            className="btn primary"
+            type="button"
+            onClick={() => setActiveTab("output")}
+          >
             Plot binning results
           </button>
-          <button id="example-btn" className="btn secondary">
+          <button
+            id="example-btn"
+            className="btn secondary"
+            type="button"
+            onClick={() => setActiveTab("output")}
+          >
             Run example data
           </button>
         </div>
