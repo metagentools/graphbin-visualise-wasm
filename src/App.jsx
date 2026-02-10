@@ -433,6 +433,16 @@ export default function App() {
                   </div>
 
                   <div className="form-row">
+                    <label htmlFor="toggle-hide-isolated">Hide isolated contigs</label>
+                    <div className="control">
+                      <label className="cb">
+                        <input id="toggle-hide-isolated" type="checkbox" />
+                        <span className="cb-box" aria-hidden="true"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
                     <label></label>
                     <div className="control">
                       <button id="reset-view" className="btn secondary">

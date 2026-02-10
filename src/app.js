@@ -46,6 +46,7 @@ let filters = {
   binOnly: "", // "" = all
   hideUnbinned: false,
   onlyChanged: false,
+  hideIsolated: false,
   khopFrom: null, // node id or null
   khopK: 0,
   collapseTips: false,
@@ -166,6 +167,12 @@ function resetInteractiveViews() {
   const onlyChanged = document.getElementById("toggle-only-changed");
   if (onlyChanged) {
     onlyChanged.checked = false;
+  }
+
+  // Hide isolated contigs → unchecked
+  const hideIsolated = document.getElementById("toggle-hide-isolated");
+  if (hideIsolated) {
+    hideIsolated.checked = false;
   }
 }
 
@@ -772,6 +779,12 @@ function initInteractiveUI() {
     render();
   });
 
+  attachControl("toggle-hide-isolated", "change", (e) => {
+    filters.hideIsolated = e.target.checked;
+    invalidateDerived();
+    render();
+  });
+
   attachControl("toggle-collapse-tips", "change", (e) => {
     filters.collapseTips = e.target.checked;
     invalidateDerived();
@@ -1180,6 +1193,11 @@ function isNodeVisible(n) {
   if (filters.hideUnbinned && (b == null || b === "")) return false;
   if (filters.onlyChanged && !n.changed) return false;
   if (filters.binOnly && b !== filters.binOnly) return false;
+
+  if (filters.hideIsolated) {
+    const deg = (graphModel.adj.get(n.id) || []).length;
+    if (deg === 0) return false;
+  }
 
   if (filters.khopFrom && filters.khopK >= 0) {
     if (!graphModel.khopSet) graphModel.khopSet = computeKHop(filters.khopFrom, filters.khopK);
