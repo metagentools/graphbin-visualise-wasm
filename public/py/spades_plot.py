@@ -1,6 +1,7 @@
 import random
 import re
 import csv
+import json
 from collections import defaultdict
 import numpy as np
 
@@ -57,6 +58,19 @@ def draw_graph_with_matplotlib(graph, out_name, visual_style, dpi=300, width=200
     ig_plot(graph, target=ax, **visual_style)
     fig.savefig(out_name, dpi=dpi, bbox_inches="tight")
     plt.close(fig)
+
+def write_layout_json(layout, contigs_map, output_path, prefix):
+    coords = {}
+    for i in range(len(contigs_map)):
+        node_id = "NODE_" + str(contigs_map[i])
+        coords[node_id] = [
+            float(layout.coords[i][0]),
+            float(layout.coords[i][1]),
+        ]
+
+    out_path = f"{output_path}{prefix}layout.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump({"coords": coords}, f)
 
 
 def run(args):
@@ -322,6 +336,9 @@ def run(args):
     # Set the layout
     my_layout = assembly_graph.layout_fruchterman_reingold()
     visual_style["layout"] = my_layout
+
+    # Save layout for reuse in interactive export
+    write_layout_json(my_layout, contigs_map, output_path, prefix)
 
     # Plot the graph
     draw_graph_with_matplotlib(

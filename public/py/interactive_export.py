@@ -2,6 +2,7 @@
 import csv
 import json
 import re
+import os
 from collections import defaultdict
 from types import SimpleNamespace
 
@@ -180,6 +181,20 @@ def _read_fasta_len_gc(contigs_fasta, contigs_map_rev):
 
     return lengths, gcs, covs
 
+def _load_layout_coords(path):
+    if not path:
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return None
+
+    if isinstance(data, dict) and "coords" in data and isinstance(data["coords"], dict):
+        return data["coords"]
+    if isinstance(data, dict):
+        return data
+    return None
 
 
 # -----------------------------
@@ -207,9 +222,17 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
     # lengths + GC + coverage
     lengths, gcs, covs = _read_fasta_len_gc(contigs_fasta, contigs_map_rev)
 
-    # layout (same algorithm)
-    layout = g.layout_fruchterman_reingold()
     deg = g.degree()
+
+    # layout: reuse the exact coordinates from static plots if available
+    layout_path = getattr(args_ns, "layout", None)
+    if not layout_path:
+        output_path = getattr(args_ns, "output", "")
+        prefix = getattr(args_ns, "prefix", "")
+        layout_path = f"{output_path}{prefix}layout.json"
+
+    layout_coords = _load_layout_coords(layout_path) if layout_path and os.path.exists(layout_path) else None
+    fallback_layout = None
 
     # --- EXACT SAME BIN COLOURS AS PNG PLOTS ---
     all_bins = []
@@ -230,10 +253,20 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
         init_bin = initial_bins.get(v)
         fin_bin = final_bins.get(v)
 
+        if layout_coords and node_id in layout_coords:
+            coord = layout_coords[node_id]
+            x = float(coord[0])
+            y = float(coord[1])
+        else:
+            if fallback_layout is None:
+                fallback_layout = g.layout_fruchterman_reingold()
+            x = float(fallback_layout.coords[v][0])
+            y = float(fallback_layout.coords[v][1])
+
         nodes.append({
             "id": node_id,
-            "x": float(layout.coords[v][0]),
-            "y": float(layout.coords[v][1]),
+            "x": x,
+            "y": y,
             "len": int(lengths.get(v, 0)),
             "gc": float(gcs[v]) if v in gcs and gcs[v] is not None else None,
             "initial_bin": init_bin,
