@@ -1,5 +1,9 @@
 # GraphBin `visualise` WASM
 
+![GitHub License](https://img.shields.io/github/license/metagentools/graphbin-visualise-wasm)
+[![Unit Testing](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/vitest.yml/badge.svg)](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/vitest.yml)
+[![E2E Testing](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/playwright.yml/badge.svg)](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/playwright.yml)
+
 A **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs, including static plots, a fully interactive assembly graph view, and a Sankey diagram summarising contig reassignment between binning results.
 
 
