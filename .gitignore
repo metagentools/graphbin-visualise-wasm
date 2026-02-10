@@ -6,3 +6,8 @@
 # Node
 node_modules/
 dist/
+
+# Testing
+test-results/
+playwright-report/
+coverage/
