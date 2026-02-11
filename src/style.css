@@ -353,6 +353,25 @@ body {
   }
 }
 
+.range-row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range-row input[type="range"]{
+  width: 100%;
+}
+
+.range-value{
+  min-width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
 label{
   font-size: 0.9rem;
   font-weight: 600;

@@ -10,6 +10,11 @@ const NODE_RADIUS = {
   locked: 8.5,   // on click
 };
 
+const NODE_RADIUS_DELTA = {
+  hover: NODE_RADIUS.hover - NODE_RADIUS.base,
+  locked: NODE_RADIUS.locked - NODE_RADIUS.base,
+};
+
 // Initial placeholder when page loads
 outputEl.textContent = "(logs will appear here)\n\n";
 
@@ -36,6 +41,8 @@ let currentTransform = null;
 
 let hoverNodeId = null;
 let lockedNodeId = null;
+
+let baseNodeRadius = NODE_RADIUS.base;
 
 // sankey state
 let sankeyLocked = null; // {srcBin, dstBin} or null
@@ -168,6 +175,13 @@ function resetInteractiveViews() {
   if (onlyChanged) {
     onlyChanged.checked = false;
   }
+
+  // Node size slider → default
+  const nodeSize = document.getElementById("node-size");
+  if (nodeSize) {
+    nodeSize.value = String(NODE_RADIUS.base);
+  }
+  setBaseNodeRadius(NODE_RADIUS.base);
 
   // Hide isolated contigs → unchecked
   const hideIsolated = document.getElementById("toggle-hide-isolated");
@@ -320,7 +334,7 @@ async function runInputPlot() {
 
   const pyodide = await getPyodide();
 
-  log("Writing input files into Pyodide FS...");
+  log("Writing input files into Pyodide FS... This step can take a while for large files. Please be patient!");
 
   const graphPath = await writeUploadedFile(pyodide, graph, "/data/assembly_graph.gfa");
   const contigsPath = await writeUploadedFile(pyodide, contigs, "/data/contigs.fasta");
@@ -346,7 +360,7 @@ async function runInputPlot() {
     delimiter: setDelimiter,
   };
 
-  log("Running GraphBin visualise in Pyodide...");
+  log("Running GraphBin visualise in Pyodide... This step can take a while for large files. Please be patient!");
 
   await pyodide.runPythonAsync(`
 import json
@@ -708,7 +722,7 @@ function initInteractiveUI() {
 
     zoomBehavior = d3
       .zoom()
-      .scaleExtent([0.05, 60])
+      .scaleExtent([0.05, 200])
       .on("zoom", (event) => {
         currentTransform = event.transform;
         render();
@@ -776,6 +790,11 @@ function initInteractiveUI() {
   attachControl("toggle-only-changed", "change", (e) => {
     filters.onlyChanged = e.target.checked;
     invalidateDerived();
+    render();
+  });
+
+  attachControl("node-size", "input", (e) => {
+    setBaseNodeRadius(e.target.value);
     render();
   });
 
@@ -1060,6 +1079,17 @@ function populateBinFilter() {
     opt.textContent = b;
     sel.appendChild(opt);
   });
+}
+
+function setBaseNodeRadius(value) {
+  const v = Number(value);
+  if (!Number.isFinite(v)) return;
+  baseNodeRadius = v;
+  const label = document.getElementById("node-size-value");
+  if (label) {
+    const text = v % 1 === 0 ? String(v) : v.toFixed(1);
+    label.textContent = text;
+  }
 }
 
 /* =========================
@@ -1388,9 +1418,9 @@ function render() {
     const isHover = n.id === hoverNodeId;
     const isLocked = n.id === lockedNodeId;
 
-    let r = NODE_RADIUS.base;
-    if (isHover) r = NODE_RADIUS.hover;
-    if (isLocked) r = NODE_RADIUS.locked;
+    let r = baseNodeRadius;
+    if (isHover) r = baseNodeRadius + NODE_RADIUS_DELTA.hover;
+    if (isLocked) r = baseNodeRadius + NODE_RADIUS_DELTA.locked;
     r = r / t.k;
 
     if (activeAdj && !activeAdj.has(n.id)) ctx.globalAlpha = 0.25;

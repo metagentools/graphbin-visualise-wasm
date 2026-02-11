@@ -443,6 +443,25 @@ export default function App() {
                   </div>
 
                   <div className="form-row">
+                    <label htmlFor="node-size">Node size</label>
+                    <div className="control">
+                      <div className="range-row">
+                        <input
+                          id="node-size"
+                          type="range"
+                          min="2"
+                          max="16"
+                          step="0.5"
+                          defaultValue="5.5"
+                        />
+                        <span id="node-size-value" className="range-value">
+                          5.5
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
                     <label></label>
                     <div className="control">
                       <button id="reset-view" className="btn secondary">
