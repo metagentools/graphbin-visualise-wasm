@@ -78,13 +78,39 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === "output") {
-      return;
+    const syncFlowPanelHeight = () => {
+      if (activeTab !== "interactive") {
+        return;
+      }
+      const panel = document.getElementById("panel-interactive");
+      if (!panel) return;
+      const h = panel.getBoundingClientRect().height;
+      if (h > 0) {
+        document.documentElement.style.setProperty(
+          "--flow-panel-height",
+          `${Math.round(h)}px`
+        );
+      }
+    };
+
+    const handleResize = () => {
+      syncFlowPanelHeight();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    let frame = null;
+    if (activeTab !== "output") {
+      frame = requestAnimationFrame(() => {
+        window.dispatchEvent(new Event("resize"));
+        syncFlowPanelHeight();
+      });
     }
-    const frame = requestAnimationFrame(() => {
-      window.dispatchEvent(new Event("resize"));
-    });
-    return () => cancelAnimationFrame(frame);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, [activeTab]);
 
   return (
@@ -500,41 +526,62 @@ export default function App() {
           >
             <h2>Contig flow between binnings</h2>
 
-            <div className="sankey-controls">
-              <div className="sankey-controls-left">
-                <label className="cb">
-                  <input id="sankey-only-changed" type="checkbox" />
-                  <span className="cb-box" aria-hidden="true"></span>
-                  <span className="cb-text">Only contigs that changed bin</span>
-                </label>
-
-                <label className="cb">
-                  <input id="sankey-hide-unbinned" type="checkbox" />
-                  <span className="cb-box" aria-hidden="true"></span>
-                  <span className="cb-text">Hide unbinned</span>
-                </label>
-              </div>
-
-              <div className="sankey-controls-right">
-                <div className="sankey-hint">Click a flow to highlight it.</div>
-              </div>
-            </div>
-
-            <div className="sankey-wrap">
-              <div className="sankey-title-row">
-                <div id="sankey-left-title" className="sankey-title">
-                  Binning 1
+            <div className="flow-body">
+              <div className="flow-stats">
+                <div className="flow-stat">
+                  <div className="flow-stat-label">Total contigs that changed bin</div>
+                  <div id="flow-stat-changed" className="flow-stat-value">—</div>
                 </div>
-                <div id="sankey-right-title" className="sankey-title">
-                  Binning 2
+                <div className="flow-stat">
+                  <div className="flow-stat-label">Number of contigs re-assigned</div>
+                  <div id="flow-stat-reassigned" className="flow-stat-value">—</div>
+                </div>
+                <div className="flow-stat">
+                  <div className="flow-stat-label">Number of initially unbinned contigs binned</div>
+                  <div id="flow-stat-unbinned-to-binned" className="flow-stat-value">—</div>
+                </div>
+                <div className="flow-stat">
+                  <div className="flow-stat-label">Number of initially binned contigs unbinned</div>
+                  <div id="flow-stat-binned-to-unbinned" className="flow-stat-value">—</div>
                 </div>
               </div>
-              <svg
-                id="sankey-svg"
-                role="img"
-                aria-label="Sankey diagram showing contig bin changes"
-              ></svg>
-              <div id="sankey-tooltip" className="tooltip" style={{ display: "none" }}></div>
+
+              <div className="sankey-controls">
+                <div className="sankey-controls-left">
+                  <label className="cb">
+                    <input id="sankey-only-changed" type="checkbox" />
+                    <span className="cb-box" aria-hidden="true"></span>
+                    <span className="cb-text">Only contigs that changed bin</span>
+                  </label>
+
+                  <label className="cb">
+                    <input id="sankey-hide-unbinned" type="checkbox" />
+                    <span className="cb-box" aria-hidden="true"></span>
+                    <span className="cb-text">Hide unbinned</span>
+                  </label>
+                </div>
+
+                <div className="sankey-controls-right">
+                  <div className="sankey-hint">Click a flow to highlight it.</div>
+                </div>
+              </div>
+
+              <div className="sankey-wrap">
+                <div className="sankey-title-row">
+                  <div id="sankey-left-title" className="sankey-title">
+                    Binning 1
+                  </div>
+                  <div id="sankey-right-title" className="sankey-title">
+                    Binning 2
+                  </div>
+                </div>
+                <svg
+                  id="sankey-svg"
+                  role="img"
+                  aria-label="Sankey diagram showing contig bin changes"
+                ></svg>
+                <div id="sankey-tooltip" className="tooltip" style={{ display: "none" }}></div>
+              </div>
             </div>
           </div>
         </div>

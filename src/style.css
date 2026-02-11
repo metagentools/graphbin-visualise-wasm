@@ -29,6 +29,7 @@
   --plot-border: #e2e8f0;
   --plot-pill-bg: #f1f5f9;
   --plot-pill-border: #e2e8f0;
+  --flow-panel-height: 720px;
 }
 
 :root[data-theme="dark"]{
@@ -680,12 +681,62 @@ select:focus{
 }
 
 /* Sankey */
+#panel-flow{
+  height: var(--flow-panel-height);
+}
+
+.flow-body{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.flow-body .sankey-wrap{
+  flex: 1;
+  min-height: 0;
+}
+
+#panel-flow #sankey-svg{
+  height: 100%;
+}
+
 .sankey-controls{
   display: flex;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 10px;
+}
+
+.flow-stats{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+
+.flow-stat{
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.flow-stat-label{
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.flow-stat-value{
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 
 .sankey-controls-left{
@@ -711,12 +762,12 @@ select:focus{
 #sankey-svg{
   display: block;
   width: 100%;
-  height: 520px;
+  height: 100%;
   background: var(--plot-bg);
 }
 
 @media (max-width: 900px){
-  #sankey-svg{ height: 420px; }
+  :root{ --flow-panel-height: 520px; }
 }
 
 .legend-hint{

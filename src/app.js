@@ -136,6 +136,12 @@ function resetInteractiveViews() {
     sankeyTooltip.innerHTML = "";
   }
 
+  // Reset flow stats
+  setFlowStat("flow-stat-changed", "—");
+  setFlowStat("flow-stat-reassigned", "—");
+  setFlowStat("flow-stat-unbinned-to-binned", "—");
+  setFlowStat("flow-stat-binned-to-unbinned", "—");
+
   // Only contigs that changed bin → unchecked
   const sankeyOnlyChanged = document.getElementById("sankey-only-changed");
   if (sankeyOnlyChanged) {
@@ -413,6 +419,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
     renderBinLegend();
     initInteractiveUI();
     initSankeyUI();
+    updateFlowStats();
 
     // Ensure first layout uses actual DOM sizes
     requestAnimationFrame(() => {
@@ -537,6 +544,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
     renderBinLegend();
     initInteractiveUI();
     initSankeyUI();
+    updateFlowStats();
 
     requestAnimationFrame(() => {
       fitToView(graphModel, true);
@@ -1039,6 +1047,48 @@ function renderSankey() {
       const s = d.name.includes(": ") ? d.name.split(": ")[1] : d.name;
       return s;
     });
+}
+
+function setFlowStat(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function isUnbinned(bin) {
+  return bin == null || bin === "" || bin === "unbinned";
+}
+
+function updateFlowStats() {
+  if (!graphModel) return;
+  let reassigned = 0;
+  let unbinnedToBinned = 0;
+  let binnedToUnbinned = 0;
+  let changed = 0;
+
+  for (const n of graphModel.nodes) {
+    const initBin = n.initial_bin;
+    const finalBin = n.final_bin;
+    const initUnbinned = isUnbinned(initBin);
+    const finalUnbinned = isUnbinned(finalBin);
+
+    if (initBin !== finalBin) {
+      changed += 1;
+    }
+    if (!initUnbinned && !finalUnbinned && initBin !== finalBin) {
+      reassigned += 1;
+    }
+    if (initUnbinned && !finalUnbinned) {
+      unbinnedToBinned += 1;
+    }
+    if (!initUnbinned && finalUnbinned) {
+      binnedToUnbinned += 1;
+    }
+  }
+
+  setFlowStat("flow-stat-changed", String(changed));
+  setFlowStat("flow-stat-reassigned", String(reassigned));
+  setFlowStat("flow-stat-unbinned-to-binned", String(unbinnedToBinned));
+  setFlowStat("flow-stat-binned-to-unbinned", String(binnedToUnbinned));
 }
 
 function attachControl(id, event, handler) {
