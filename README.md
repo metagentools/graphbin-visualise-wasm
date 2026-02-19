@@ -1,13 +1,13 @@
-# GraphBin `visualise` WASM
+# GraphBin-Viz: Interactive Visual Analytics for Exploring Graph-based Metagenomic Binning
 
 ![GitHub License](https://img.shields.io/github/license/metagentools/graphbin-visualise-wasm)
 [![Unit Testing](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/vitest.yml/badge.svg)](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/vitest.yml)
 [![E2E Testing](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/playwright.yml/badge.svg)](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/playwright.yml)
 
-A **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs, including static plots, a fully interactive assembly graph view, and a Sankey diagram summarising contig reassignment between binning results.
+GraphBin-Viz is a **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs, including static plots, a fully interactive assembly graph view, and a Sankey diagram summarising contig reassignment between binning results. It runs GraphBin locally on your device using your uploaded data, and no data ever leaves your device.
 
 
-This project uses Pyodide (Python compiled to WebAssembly) to run `igraph`, GraphBin’s graph visualisation code, and the plotting code entirely in the browser — no backend needed.
+This project uses Pyodide (Python compiled to WebAssembly) to run GraphBin, visualisation, and plotting code entirely in the browser — no backend needed.
 
 ## Web App (Anyone can use)
 
