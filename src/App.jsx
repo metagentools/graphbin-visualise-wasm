@@ -132,8 +132,19 @@ export default function App() {
       <header className="app-header">
         <h1>GraphBin Visualise Wasm</h1>
         <p className="subtitle">
-          Visualise and compare metagenomic binning results with the refined
-          GraphBin output directly in your browser. GraphBin runs locally on your
+          Refine your metagenomic binning results with{" "}
+          <a
+            href="https://github.com/metagentools/GraphBin"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GraphBin
+          </a>{" "}
+          directly in your browser.
+          You can visualise and compare metagenomic binning results with the refined
+          GraphBin using interactive views. 
+          <br />
+          GraphBin runs locally on your
           device using your uploaded assembly graph + initial binning, and no
           data ever leaves your device.
           <br />
