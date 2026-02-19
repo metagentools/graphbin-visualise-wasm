@@ -342,29 +342,88 @@ export default function App() {
           <div className="settings-group settings-group-wide">
             <div className="settings-title">GraphBin Settings</div>
             <div className="form-grid two-col">
-              <div className="form-row">
-                <label htmlFor="setting-max-iter">Max Iterations</label>
-                <div className="control">
-                  <input
-                    type="number"
-                    id="setting-max-iter"
-                    defaultValue="50"
-                    min="1"
-                  />
+              <div className="form-grid">
+                <div className="form-row">
+                  <div className="label-with-help">
+                    <label htmlFor="setting-max-iter">Max Iterations</label>
+                    <details className="help" role="group">
+                      <summary aria-label="Max Iterations help">?</summary>
+                      <span className="help-tooltip" role="tooltip">
+                        Maximum number of interations for the label propagation
+                      </span>
+                    </details>
+                  </div>
+                  <div className="control">
+                    <input
+                      type="number"
+                      id="setting-max-iter"
+                      defaultValue="50"
+                      min="1"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="label-with-help">
+                    <label htmlFor="setting-min-bin-size">Minimum bin size</label>
+                    <details className="help" role="group">
+                      <summary aria-label="Minimum bin size help">?</summary>
+                      <span className="help-tooltip" role="tooltip">
+                        Minimum bin size to prevent bins from being removed during label correction
+                      </span>
+                    </details>
+                  </div>
+                  <div className="control">
+                    <input
+                      type="number"
+                      id="setting-min-bin-size"
+                      defaultValue="5"
+                      min="1"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="form-row">
-                <label htmlFor="setting-diff-threshold">Diff Threshold</label>
-                <div className="control">
-                  <input
-                    type="number"
-                    id="setting-diff-threshold"
-                    defaultValue="0.00001"
-                    step="0.000001"
-                    min="0"
-                  />
+              <div className="form-grid">
+                <div className="form-row">
+                  <div className="label-with-help">
+                    <label htmlFor="setting-diff-threshold">Diff Threshold</label>
+                    <details className="help" role="group">
+                      <summary aria-label="Diff Threshold help">?</summary>
+                      <span className="help-tooltip" role="tooltip">
+                        Difference threshold to stop the label propagation
+                      </span>
+                    </details>
+                  </div>
+                  <div className="control">
+                    <input
+                      type="number"
+                      id="setting-diff-threshold"
+                      defaultValue="0.00001"
+                      step="0.000001"
+                      min="0"
+                    />
+                  </div>
                 </div>
+
+                <div className="form-row">
+                  <div className="label-with-help">
+                    <label htmlFor="setting-show-lp-log">Show LP log</label>
+                    <details className="help" role="group">
+                      <summary aria-label="Show LP log help">?</summary>
+                      <span className="help-tooltip" role="tooltip">
+                        Show logs from label propagation
+                      </span>
+                    </details>
+                  </div>
+                  <div className="control">
+                    <select id="setting-show-lp-log" defaultValue="false">
+                      <option value="false">No</option>
+                      <option value="true">Yes</option>
+                    </select>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>

@@ -16,7 +16,7 @@ __status__ = "Production"
 
 logger = logging.getLogger(f"GraphBin {__version__}")
 
-MIN_BIN_COUNT = 10
+MIN_BIN_COUNT = 5
 
 
 def getClosestLabelledVertices(graph, node, binned_contigs):
@@ -106,8 +106,18 @@ def _find_ambiguous_vertices(n_bins, bins, assembly_graph, misbinned_set, binned
 
 
 def graphbin_main(
-    n_bins, bins, bins_list, assembly_graph, node_count, diff_threshold, max_iteration
+    n_bins,
+    bins,
+    bins_list,
+    assembly_graph,
+    node_count,
+    diff_threshold,
+    max_iteration,
+    min_bin_size=MIN_BIN_COUNT,
+    show_lp_log=False,
 ):
+    if min_bin_size is None or min_bin_size < 1:
+        min_bin_size = MIN_BIN_COUNT
     logger.info("Determining ambiguous vertices")
 
     binned_contigs = []
@@ -147,11 +157,11 @@ def graphbin_main(
 
             if not neighbours_have_same_label:
                 if my_bin in remove_by_bin:
-                    if len(bins[my_bin]) - len(remove_by_bin[my_bin]) >= MIN_BIN_COUNT:
+                    if len(bins[my_bin]) - len(remove_by_bin[my_bin]) >= min_bin_size:
                         remove_labels_initial.append(i)
                         remove_by_bin[my_bin].append(i)
                 else:
-                    if len(bins[my_bin]) >= MIN_BIN_COUNT:
+                    if len(bins[my_bin]) >= min_bin_size:
                         remove_labels_initial.append(i)
                         remove_by_bin[my_bin] = [i]
 
@@ -189,12 +199,12 @@ def graphbin_main(
                         if my_bin in remove_by_bin:
                             if (
                                 len(bins[my_bin]) - len(remove_by_bin[my_bin])
-                                >= MIN_BIN_COUNT
+                                >= min_bin_size
                             ):
                                 remove_labels_initial.append(i)
                                 remove_by_bin[my_bin].append(i)
                         else:
-                            if len(bins[my_bin]) >= MIN_BIN_COUNT:
+                            if len(bins[my_bin]) >= min_bin_size:
                                 remove_labels_initial.append(i)
                                 remove_by_bin[my_bin] = [i]
 
@@ -320,7 +330,23 @@ def graphbin_main(
         + str(max_iteration)
     )
 
-    ans = lp.run(diff_threshold, max_iteration, show_log=True, clean_result=False)
+    logger_state = None
+    if show_lp_log:
+        logger_state = (logger.level, [h.level for h in logger.handlers])
+        logger.setLevel(logging.DEBUG)
+        for h in logger.handlers:
+            h.setLevel(logging.DEBUG)
+
+    try:
+        ans = lp.run(
+            diff_threshold, max_iteration, show_log=show_lp_log, clean_result=False
+        )
+    finally:
+        if logger_state is not None:
+            prev_level, prev_handler_levels = logger_state
+            logger.setLevel(prev_level)
+            for h, level in zip(logger.handlers, prev_handler_levels):
+                h.setLevel(level)
 
     logger.info("Obtaining Label Propagation result")
 
@@ -356,11 +382,11 @@ def graphbin_main(
 
             if not neighbours_have_same_label:
                 if my_bin in remove_by_bin:
-                    if len(bins[my_bin]) - len(remove_by_bin[my_bin]) >= MIN_BIN_COUNT:
+                    if len(bins[my_bin]) - len(remove_by_bin[my_bin]) >= min_bin_size:
                         remove_labels.append(i)
                         remove_by_bin[my_bin].append(i)
                 else:
-                    if len(bins[my_bin]) >= MIN_BIN_COUNT:
+                    if len(bins[my_bin]) >= min_bin_size:
                         remove_labels.append(i)
                         remove_by_bin[my_bin] = [i]
 

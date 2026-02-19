@@ -50,6 +50,8 @@ def run(args):
     delimiter = args.delimiter
     max_iteration = args.max_iteration
     diff_threshold = args.diff_threshold
+    min_bin_size = getattr(args, "min_bin_size", 5)
+    show_lp_log = getattr(args, "show_lp_log", False)
 
     # Setup logger
     logger = logging.getLogger(f"GraphBin {__version__}")
@@ -100,6 +102,8 @@ def run(args):
     logger.info(f"Final binning output file: {output_path}")
     logger.info(f"Maximum number of iterations: {max_iteration}")
     logger.info(f"Difference threshold: {diff_threshold}")
+    logger.info(f"Minimum bin size: {min_bin_size}")
+    logger.info(f"Show label propagation log: {show_lp_log}")
 
     logger.info("GraphBin started")
 
@@ -139,6 +143,8 @@ def run(args):
         node_count,
         diff_threshold,
         max_iteration,
+        min_bin_size,
+        show_lp_log,
     )
 
     elapsed_time = time.time() - start_time

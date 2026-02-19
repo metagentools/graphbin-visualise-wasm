@@ -21,6 +21,7 @@ const NODE_RADIUS_DELTA = {
 const GRAPHBIN_DEFAULTS = {
   max_iteration: 50,
   diff_threshold: 0.00001,
+  min_bin_size: 5,
 };
 
 // Initial placeholder when page loads
@@ -401,17 +402,27 @@ async function runInputPlot() {
   const setImgtype = document.getElementById("setting-imgtype").value;
   const setDelimiter = document.getElementById("setting-delimiter").value;
   const setMaxIterRaw = parseInt(document.getElementById("setting-max-iter").value, 10);
+  const setMinBinRaw = parseInt(
+    document.getElementById("setting-min-bin-size").value,
+    10
+  );
   const setDiffRaw = parseFloat(
     document.getElementById("setting-diff-threshold").value
   );
+  const showLpLogValue = document.getElementById("setting-show-lp-log").value;
   const setMaxIter =
     Number.isFinite(setMaxIterRaw) && setMaxIterRaw > 0
       ? setMaxIterRaw
       : GRAPHBIN_DEFAULTS.max_iteration;
+  const setMinBinSize =
+    Number.isFinite(setMinBinRaw) && setMinBinRaw > 0
+      ? setMinBinRaw
+      : GRAPHBIN_DEFAULTS.min_bin_size;
   const setDiffThreshold =
     Number.isFinite(setDiffRaw) && setDiffRaw >= 0
       ? setDiffRaw
       : GRAPHBIN_DEFAULTS.diff_threshold;
+  const setShowLpLog = showLpLogValue === "true";
 
   if (!graph || !contigs || !paths || !initial) {
     log("Please pick all input files (graph, contigs, paths, initial).");
@@ -437,7 +448,9 @@ async function runInputPlot() {
     prefix: "",
     delimiter: setDelimiter,
     max_iteration: setMaxIter,
+    min_bin_size: setMinBinSize,
     diff_threshold: setDiffThreshold,
+    show_lp_log: setShowLpLog,
   };
 
   log("Running GraphBin in Pyodide... This step can take a while for large files.");
@@ -587,17 +600,27 @@ async function runExamplePlot() {
   const setImgtype = document.getElementById("setting-imgtype").value;
   const setDelimiter = document.getElementById("setting-delimiter").value;
   const setMaxIterRaw = parseInt(document.getElementById("setting-max-iter").value, 10);
+  const setMinBinRaw = parseInt(
+    document.getElementById("setting-min-bin-size").value,
+    10
+  );
   const setDiffRaw = parseFloat(
     document.getElementById("setting-diff-threshold").value
   );
+  const showLpLogValue = document.getElementById("setting-show-lp-log").value;
   const setMaxIter =
     Number.isFinite(setMaxIterRaw) && setMaxIterRaw > 0
       ? setMaxIterRaw
       : GRAPHBIN_DEFAULTS.max_iteration;
+  const setMinBinSize =
+    Number.isFinite(setMinBinRaw) && setMinBinRaw > 0
+      ? setMinBinRaw
+      : GRAPHBIN_DEFAULTS.min_bin_size;
   const setDiffThreshold =
     Number.isFinite(setDiffRaw) && setDiffRaw >= 0
       ? setDiffRaw
       : GRAPHBIN_DEFAULTS.diff_threshold;
+  const setShowLpLog = showLpLogValue === "true";
 
   const pyodide = await getPyodide();
 
@@ -626,7 +649,9 @@ async function runExamplePlot() {
     prefix: "",
     delimiter: setDelimiter,
     max_iteration: setMaxIter,
+    min_bin_size: setMinBinSize,
     diff_threshold: setDiffThreshold,
+    show_lp_log: setShowLpLog,
   };
 
   log("Running GraphBin on example data in Pyodide...");
