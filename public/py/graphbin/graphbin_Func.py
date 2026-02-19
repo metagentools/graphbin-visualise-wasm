@@ -61,14 +61,14 @@ def _build_contig_bin_map(n_bins, bins):
     return contig_to_bin
 
 
-def _find_misbinned_vertices(n_bins, bins, assembly_graph):
+def _find_misbinned_vertices(n_bins, bins, assembly_graph, binned_contigs):
     contig_to_bin = _build_contig_bin_map(n_bins, bins)
     misbinned = []
 
     for contig, my_bin in contig_to_bin.items():
-        neighbours = assembly_graph.neighbors(contig, mode="all")
+        closest = getClosestLabelledVertices(assembly_graph, contig, binned_contigs)
         labelled_bins = []
-        for neighbour in neighbours:
+        for neighbour in closest:
             if neighbour in contig_to_bin:
                 labelled_bins.append(contig_to_bin[neighbour])
 
@@ -83,16 +83,16 @@ def _find_misbinned_vertices(n_bins, bins, assembly_graph):
     return misbinned
 
 
-def _find_ambiguous_vertices(n_bins, bins, assembly_graph, misbinned_set):
+def _find_ambiguous_vertices(n_bins, bins, assembly_graph, misbinned_set, binned_contigs):
     contig_to_bin = _build_contig_bin_map(n_bins, bins)
     ambiguous = []
 
     for contig, my_bin in contig_to_bin.items():
         if contig in misbinned_set:
             continue
-        neighbours = assembly_graph.neighbors(contig, mode="all")
+        closest = getClosestLabelledVertices(assembly_graph, contig, binned_contigs)
         labelled_bins = []
-        for neighbour in neighbours:
+        for neighbour in closest:
             if neighbour in contig_to_bin:
                 labelled_bins.append(contig_to_bin[neighbour])
 
@@ -110,8 +110,14 @@ def graphbin_main(
 ):
     logger.info("Determining ambiguous vertices")
 
-    misbinned = _find_misbinned_vertices(n_bins, bins, assembly_graph)
-    ambiguous = _find_ambiguous_vertices(n_bins, bins, assembly_graph, set(misbinned))
+    binned_contigs = []
+    for n in range(n_bins):
+        binned_contigs = sorted(binned_contigs + bins[n])
+
+    misbinned = _find_misbinned_vertices(n_bins, bins, assembly_graph, binned_contigs)
+    ambiguous = _find_ambiguous_vertices(
+        n_bins, bins, assembly_graph, set(misbinned), binned_contigs
+    )
 
     remove_by_bin = {}
 
@@ -158,11 +164,6 @@ def graphbin_main(
                 bins[n].remove(i)
 
     # Further remove labels of ambiguous vertices
-    binned_contigs = []
-
-    for n in range(n_bins):
-        binned_contigs = sorted(binned_contigs + bins[n])
-
     for b in range(n_bins):
         for i in bins[b]:
             if i not in neighbours_have_same_label_list:
