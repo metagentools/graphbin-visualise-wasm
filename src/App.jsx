@@ -3,6 +3,7 @@ import { initApp } from "./app.js";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("output");
+  const baseUrl = import.meta.env.BASE_URL || "/";
 
   useEffect(() => {
     initApp();
@@ -130,29 +131,55 @@ export default function App() {
         </svg>
       </button>
       <header className="app-header">
-        <h1>GraphBin Visualise Wasm</h1>
-        <p className="subtitle">
-          Refine your metagenomic binning results with{" "}
-          <a
-            href="https://github.com/metagentools/GraphBin"
-            target="_blank"
-            rel="noreferrer"
-          >
-            GraphBin
-          </a>{" "}
-          directly in your browser.
-          You can visualise and compare metagenomic binning results with the refined
-          GraphBin using interactive views. 
-          <br />
-          GraphBin runs locally on your
-          device using your uploaded assembly graph + initial binning, and no
-          data ever leaves your device.
-          <br />
-          You can load your own data (click on the tooltips for more information
-          about the files to be uploaded) and click{" "}
-          <b>Plot binning results</b>, or click <b>Run example data</b> to see
-          how it works on the provided example data.
-        </p>
+        <h1>GraphBin-Viz</h1>
+        <div className="title-subtitle">
+          Interactive Visual Analytics for Exploring Graph-based Metagenomic
+          Binning
+        </div>
+        <div className="intro-row">
+          <p className="subtitle">
+            Refine your metagenomic binning results with{" "}
+            <a
+              href="https://github.com/metagentools/GraphBin"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GraphBin
+            </a>{" "}
+            directly in your browser. You can visualise and compare the
+            binning results using the provided interactive views.
+            <br />
+            GraphBin runs locally on your device using your uploaded assembly
+            graph + initial binning, and no data ever leaves your device.
+            <br />
+            You can load your own data (click on the tooltips for more
+            information about the files to be uploaded) and click{" "}
+            <b>Plot binning results</b>, or click <b>Run example data</b> to see
+            how it works on the provided example data.
+          </p>
+          <div className="intro-logo">
+            <a
+              href="https://github.com/metagentools/GraphBin"
+              target="_blank"
+              rel="noreferrer"
+              className="logo-link"
+              aria-label="GraphBin on GitHub"
+            >
+              <span className="logo-swap" aria-hidden="true">
+                <img
+                  src={`${baseUrl}GraphBin_logo_light.png`}
+                  alt=""
+                  className="graphbin-logo logo-light"
+                />
+                <img
+                  src={`${baseUrl}GraphBin_logo_dark.png`}
+                  alt=""
+                  className="graphbin-logo logo-dark"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
       </header>
 
       <section className="panel">

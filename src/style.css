@@ -149,7 +149,7 @@ body {
 
 .theme-toggle .icon{
   width: 20px;
-  height: 20px;
+  height: 44px;
   fill: currentColor;
   position: absolute;
   transition: transform 0.2s ease, opacity 0.2s ease;
@@ -203,12 +203,97 @@ body {
   font-family: var(--font-display);
 }
 
+.title-subtitle{
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.logo-swap{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+}
+
+.graphbin-logo{
+  height: 66px;
+  width: auto;
+  display: block;
+}
+
+
+.logo-light{
+  display: block;
+}
+
+.logo-dark{
+  display: none;
+}
+
+:root[data-theme="dark"] .logo-light{
+  display: none;
+}
+
+:root[data-theme="dark"] .logo-dark{
+  display: block;
+}
+
 .subtitle {
-  margin: 0 0 24px;
+  margin: 0;
   color: var(--muted);
   font-size: 0.98rem;
   line-height: 1.5;
   max-width: 100%;
+}
+
+.intro-row{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 24px;
+}
+
+.intro-logo{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-width: 160px;
+}
+
+.logo-link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.logo-link:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+}
+
+.logo-link:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+@media (max-width: 900px){
+  .intro-row{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .intro-logo{
+    min-width: 0;
+  }
 }
 
 .subtitle a{
@@ -989,7 +1074,7 @@ select:focus{
 
 .cb-box{
   width: 20px;
-  height: 20px;
+  height: 44px;
   border-radius: 6px;
   border: 1.5px solid var(--border);
   background: var(--input-bg);
