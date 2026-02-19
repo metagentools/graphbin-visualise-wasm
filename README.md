@@ -103,15 +103,17 @@ git clone https://github.com/metagentools/graphbin-viz.git
 cd graphbin-viz
 ```
 
-Because the browser cannot fetch local files with `file:///`, you must serve it with a lightweight local server. You will need Python for this step.
+Because the browser cannot fetch local files with `file:///`, you must serve it with a local server. You will need Node.js for this step. Check here for instructions to setup [Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Then run the following commands.
 
 ```shell
-python -m http.server 8000
+npm install
+npm run build
+npm run preview 
 ```
 
-Then copy and paste the following link in your web browser.
+Then copy and paste the link shown as "Local:" in your web browser. It will look something like this.
 ```shell
-http://localhost:8000
+http://localhost:4173/graphbin-viz/
 ```
 
 ## Acknowledgement
