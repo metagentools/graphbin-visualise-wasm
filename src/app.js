@@ -879,6 +879,7 @@ function renderBinLegend() {
 
   // Add unbinned
   el.appendChild(makeLegendRow("(unbinned)", "#d3d3d3"));
+  el.appendChild(makeLegendRow("Misbinned?", "#ef4444", "misbinned"));
 
   // bins in sorted order for consistency
   const entries = [...binColorMap.entries()].sort((a, b) =>
@@ -890,13 +891,18 @@ function renderBinLegend() {
   }
 }
 
-function makeLegendRow(label, color) {
+function makeLegendRow(label, color, variant = "solid") {
   const row = document.createElement("div");
   row.className = "bin-legend-item";
 
   const sw = document.createElement("div");
   sw.className = "bin-legend-swatch";
-  sw.style.background = color;
+  if (variant === "misbinned") {
+    sw.classList.add("legend-misbinned");
+    sw.style.borderColor = color;
+  } else {
+    sw.style.background = color;
+  }
 
   const txt = document.createElement("div");
   txt.className = "bin-legend-label";
@@ -1596,13 +1602,14 @@ function formatTooltip(n) {
 
   return `
     <div><b>${escapeHtml(n.id)}</b></div>
-    <div>length: ${n.len ?? 0}bp</div>
+    <div>length: ${Number(n.len ?? 0).toLocaleString()}bp</div>
     <div>GC%: ${n.gc == null ? "n/a" : Number(n.gc).toFixed(2)}</div>
     <div>coverage: ${n.cov == null ? "n/a" : Number(n.cov).toFixed(2)}</div>
     <div>degree: ${deg}</div>
     <div>initial: ${escapeHtml(init)}</div>
     <div>final: ${escapeHtml(fin)}</div>
     <div>shown: ${escapeHtml(shown)}</div>
+    ${n.misbinned ? "<div>misbinned: yes</div>" : ""}
     <div>adj bins: ${escapeHtml(mix || "n/a")}</div>
   `;
 }
@@ -1747,6 +1754,18 @@ function render() {
       ctx.strokeStyle = "#111827";
       ctx.stroke();
     }
+
+    if (filters.mode === "initial" && n.misbinned) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r + (2 / t.k), 0, Math.PI * 2);
+      ctx.lineWidth = 2 / t.k;
+      ctx.setLineDash([2 / t.k, 2 / t.k]);
+      ctx.strokeStyle = "#ef4444";
+      ctx.stroke();
+      ctx.restore();
+    }
+
   }
 }
 

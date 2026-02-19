@@ -53,14 +53,44 @@ def getClosestLabelledVertices(graph, node, binned_contigs):
     return labelled
 
 
+def _build_contig_bin_map(n_bins, bins):
+    contig_to_bin = {}
+    for b in range(n_bins):
+        for contig in bins[b]:
+            contig_to_bin[contig] = b
+    return contig_to_bin
+
+
+def _find_misbinned_vertices(n_bins, bins, assembly_graph):
+    contig_to_bin = _build_contig_bin_map(n_bins, bins)
+    misbinned = []
+
+    for contig, my_bin in contig_to_bin.items():
+        neighbours = assembly_graph.neighbors(contig, mode="all")
+        labelled_bins = []
+        for neighbour in neighbours:
+            if neighbour in contig_to_bin:
+                labelled_bins.append(contig_to_bin[neighbour])
+
+        if not labelled_bins:
+            continue
+
+        if all(nb != my_bin for nb in labelled_bins):
+            misbinned.append(contig)
+
+    return misbinned
+
+
 def graphbin_main(
     n_bins, bins, bins_list, assembly_graph, node_count, diff_threshold, max_iteration
 ):
     logger.info("Determining ambiguous vertices")
 
+    misbinned = _find_misbinned_vertices(n_bins, bins, assembly_graph)
+
     remove_by_bin = {}
 
-    remove_labels = []
+    remove_labels_initial = []
 
     neighbours_have_same_label_list = []
 
@@ -87,17 +117,17 @@ def graphbin_main(
             if not neighbours_have_same_label:
                 if my_bin in remove_by_bin:
                     if len(bins[my_bin]) - len(remove_by_bin[my_bin]) >= MIN_BIN_COUNT:
-                        remove_labels.append(i)
+                        remove_labels_initial.append(i)
                         remove_by_bin[my_bin].append(i)
                 else:
                     if len(bins[my_bin]) >= MIN_BIN_COUNT:
-                        remove_labels.append(i)
+                        remove_labels_initial.append(i)
                         remove_by_bin[my_bin] = [i]
 
             elif neighbours_binned:
                 neighbours_have_same_label_list.append(i)
 
-    for i in remove_labels:
+    for i in remove_labels_initial:
         for n in range(n_bins):
             if i in bins[n]:
                 bins[n].remove(i)
@@ -129,23 +159,23 @@ def graphbin_main(
                                     neighbours_have_same_label = False
                                     break
 
-                    if not neighbours_have_same_label and i not in remove_labels:
+                    if not neighbours_have_same_label and i not in remove_labels_initial:
                         if my_bin in remove_by_bin:
                             if (
                                 len(bins[my_bin]) - len(remove_by_bin[my_bin])
                                 >= MIN_BIN_COUNT
                             ):
-                                remove_labels.append(i)
+                                remove_labels_initial.append(i)
                                 remove_by_bin[my_bin].append(i)
                         else:
                             if len(bins[my_bin]) >= MIN_BIN_COUNT:
-                                remove_labels.append(i)
+                                remove_labels_initial.append(i)
                                 remove_by_bin[my_bin] = [i]
 
     logger.info("Removing labels of ambiguous vertices")
 
     # Remove labels of ambiguous vertices
-    for i in remove_labels:
+    for i in remove_labels_initial:
         for n in range(n_bins):
             if i in bins[n]:
                 bins[n].remove(i)
@@ -324,4 +354,4 @@ def graphbin_main(
         for contig in bins[i]:
             final_bins[contig] = bins_list[i]
 
-    return final_bins, remove_labels, non_isolated
+    return final_bins, remove_labels_initial, non_isolated, misbinned
