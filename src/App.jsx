@@ -132,21 +132,22 @@ export default function App() {
       <header className="app-header">
         <h1>GraphBin Visualise Wasm</h1>
         <p className="subtitle">
-          Visualise and compare metagenomic binning results and improved binning
-          results from GraphBin (or a similar bin-improvement tool) directly in your browser. 
-          All processing happens locally on your device, and no data ever leaves it.
+          Visualise and compare metagenomic binning results with the refined
+          GraphBin output directly in your browser. GraphBin runs locally on your
+          device using your uploaded assembly graph + initial binning, and no
+          data ever leaves your device.
           <br />
-          You can load your own data (click on the tooltips for more information about the files 
-          to be uploaded) and click <b>Plot binning results</b>, or
-          click <b>Run example data</b> to see how it works on the example data
-          provided.
+          You can load your own data (click on the tooltips for more information
+          about the files to be uploaded) and click{" "}
+          <b>Plot binning results</b>, or click <b>Run example data</b> to see
+          how it works on the provided example data.
         </p>
       </header>
 
       <section className="panel">
         <div id="config-two-col">
           <div id="input-files-col">
-            <h3>Input Files</h3>
+            <div className="settings-title">Input Files</div>
 
             <div className="form-grid">
               <div className="form-row">
@@ -218,29 +219,13 @@ export default function App() {
                     <summary aria-label="Initial binning result help">?</summary>
                     <span className="help-tooltip" role="tooltip">
                       The binning result from any existing metagenomic binning
-                      tool in CSV or TSV format (contig name, bin ID)
+                      tool in CSV or TSV format (contig name, bin ID). GraphBin
+                      will refine this result.
                     </span>
                   </details>
                 </div>
                 <div className="control">
                   <input id="initial" type="file" />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="label-with-help">
-                  <label htmlFor="graphbin">GraphBin result</label>
-                  <details className="help" role="group">
-                    <summary aria-label="GraphBin result help">?</summary>
-                    <span className="help-tooltip" role="tooltip">
-                      Improved binning result from GraphBin or similar
-                      bin-improvement tool in CSV or TSV format. Currently
-                      supports same bin names as the initial binning result.
-                    </span>
-                  </details>
-                </div>
-                <div className="control">
-                  <input id="graphbin" type="file" />
                 </div>
               </div>
 
@@ -265,7 +250,7 @@ export default function App() {
           </div>
 
           <div id="settings-panel">
-            <h3>Plot Settings</h3>
+            <div className="settings-title">Plot Settings</div>
 
             <div className="form-grid">
               <div className="form-row">
@@ -311,6 +296,36 @@ export default function App() {
                     <option value="svg">SVG</option>
                     <option value="pdf">PDF</option>
                   </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-group settings-group-wide">
+            <div className="settings-title">GraphBin Settings</div>
+            <div className="form-grid two-col">
+              <div className="form-row">
+                <label htmlFor="setting-max-iter">Max Iterations</label>
+                <div className="control">
+                  <input
+                    type="number"
+                    id="setting-max-iter"
+                    defaultValue="50"
+                    min="1"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="setting-diff-threshold">Diff Threshold</label>
+                <div className="control">
+                  <input
+                    type="number"
+                    id="setting-diff-threshold"
+                    defaultValue="0.00001"
+                    step="0.000001"
+                    min="0"
+                  />
                 </div>
               </div>
             </div>
@@ -377,32 +392,60 @@ export default function App() {
         </div>
 
         <div className="tab-panels">
-          <div
+            <div
             id="panel-output"
             className={`tab-panel ${activeTab === "output" ? "active" : ""}`}
             role="tabpanel"
             aria-labelledby="tab-output"
           >
             <div className="tab-section">
-              <h2>Output</h2>
-              <div id="output">(logs will appear here)</div>
+              <div className="section-header">
+                <h2>Output</h2>
+                <div className="section-actions">
+                  <span className="collapse-hint" aria-hidden="true">
+                    Collapsed
+                  </span>
+                  <button
+                    className="collapse-toggle"
+                    type="button"
+                    data-target="section-output"
+                    aria-controls="section-output"
+                    aria-expanded="true"
+                  >
+                    Collapse
+                  </button>
+                </div>
+              </div>
+              <div id="section-output" className="section-body">
+                <div id="output">(logs will appear here)</div>
+                <div className="status-card">
+                  <div className="status-title">GraphBin status</div>
+                  <div id="graphbin-status" className="status-log">
+                    (GraphBin logs will appear here)
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="tab-section">
-              <h2>Plots</h2>
-              <div id="plots-row">
-                <div className="plot-block" id="initial-block" style={{ display: "none" }}>
-                  <img id="initial-img" alt="Initial binning plot" />
-                  <button id="download-initial" className="btn tertiary">
-                    Download initial binning result plot
-                  </button>
-                </div>
+              <div className="section-header">
+                <h2>Plots</h2>
+              </div>
+              <div id="section-plots" className="section-body">
+                <div id="plots-row">
+                  <div className="plot-block" id="initial-block" style={{ display: "none" }}>
+                    <img id="initial-img" alt="Initial binning plot" />
+                    <button id="download-initial" className="btn tertiary">
+                      Download initial binning result plot
+                    </button>
+                  </div>
 
-                <div className="plot-block" id="final-block" style={{ display: "none" }}>
-                  <img id="final-img" alt="GraphBin binning plot" />
-                  <button id="download-final" className="btn tertiary">
-                    Download GraphBin binning result plot
-                  </button>
+                  <div className="plot-block" id="final-block" style={{ display: "none" }}>
+                    <img id="final-img" alt="GraphBin binning plot" />
+                    <button id="download-final" className="btn tertiary">
+                      Download GraphBin binning result plot
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

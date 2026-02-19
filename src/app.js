@@ -3,6 +3,9 @@ export function initApp() {
   window.__graphbinAppInitialized = true;
 
 const outputEl = document.getElementById("output");
+const graphbinStatusEl = document.getElementById("graphbin-status");
+let graphbinStatusBuffer = [];
+let graphbinStatusHasLog = false;
 
 const NODE_RADIUS = {
   base: 5.5,     // default node radius
@@ -15,12 +18,44 @@ const NODE_RADIUS_DELTA = {
   locked: NODE_RADIUS.locked - NODE_RADIUS.base,
 };
 
+const GRAPHBIN_DEFAULTS = {
+  max_iteration: 50,
+  diff_threshold: 0.00001,
+};
+
 // Initial placeholder when page loads
 outputEl.textContent = "(logs will appear here)\n\n";
 
 function log(msg) {
   outputEl.textContent += msg + "\n";
 }
+
+function setGraphbinStatus(msg) {
+  if (!graphbinStatusEl) return;
+  graphbinStatusEl.textContent = msg;
+}
+
+function resetGraphbinStatus(msg) {
+  graphbinStatusBuffer = [];
+  graphbinStatusHasLog = false;
+  setGraphbinStatus(msg);
+}
+
+function appendGraphbinStatus(msg) {
+  if (!graphbinStatusEl) return;
+  const lines = String(msg ?? "").split("\n");
+  for (const line of lines) {
+    graphbinStatusBuffer.push(line);
+  }
+  if (graphbinStatusBuffer.length > 2000) {
+    graphbinStatusBuffer = graphbinStatusBuffer.slice(-2000);
+  }
+  graphbinStatusHasLog = true;
+  graphbinStatusEl.textContent = graphbinStatusBuffer.join("\n");
+  graphbinStatusEl.scrollTop = graphbinStatusEl.scrollHeight;
+}
+
+window.graphbinLog = appendGraphbinStatus;
 
 // store Pyodide init promise here, but don't start it yet
 let pyodideReady = null;
@@ -240,6 +275,15 @@ async function getPyodide() {
       pyodide.FS.mkdir("/py");
     } catch (e) {}
     try {
+      pyodide.FS.mkdir("/py/graphbin");
+    } catch (e) {}
+    try {
+      pyodide.FS.mkdir("/py/graphbin/parsers");
+    } catch (e) {}
+    try {
+      pyodide.FS.mkdir("/py/graphbin/labelpropagation");
+    } catch (e) {}
+    try {
       pyodide.FS.mkdir("/data");
     } catch (e) {}
     try {
@@ -247,9 +291,19 @@ async function getPyodide() {
     } catch (e) {}
 
     // Fetch Python files and write them into Pyodide’s filesystem
-    const files = ["spades_plot.py", "bidictmap.py", "interactive_export.py"];
+    const files = [
+      "spades_plot.py",
+      "bidictmap.py",
+      "interactive_export.py",
+      "graphbin/graphbin_SPAdes.py",
+      "graphbin/graphbin_Func.py",
+      "graphbin/labelpropagation/__init__.py",
+      "graphbin/labelpropagation/labelprop.py",
+      "graphbin/parsers/__init__.py",
+      "graphbin/parsers/spades_parser.py",
+    ];
+    log("Loading Python files into Pyodide FS...");
     for (const f of files) {
-      log("Loading " + f + " into Pyodide FS...");
       const text = await (await fetch("py/" + f)).text();
       pyodide.FS.writeFile("/py/" + f, text);
     }
@@ -259,6 +313,8 @@ async function getPyodide() {
 import sys
 if "/py" not in sys.path:
     sys.path.append("/py")
+if "/py/graphbin" not in sys.path:
+    sys.path.append("/py/graphbin")
     `);
 
     return pyodide;
@@ -302,6 +358,10 @@ function readJsonFromPyodide(pyodide, path) {
   return JSON.parse(data);
 }
 
+function readTextFromPyodide(pyodide, path) {
+  return pyodide.FS.readFile(path, { encoding: "utf8" });
+}
+
 function fileToImgSrc(pyodide, path) {
   const data = pyodide.FS.readFile(path); // Uint8Array
   const blob = new Blob([data], { type: "image/png" });
@@ -314,6 +374,7 @@ function fileToImgSrc(pyodide, path) {
 async function runInputPlot() {
   // clear old logs and hide old plots
   outputEl.textContent = "";
+  resetGraphbinStatus("(GraphBin logs will appear here)");
   const initialBlock = document.getElementById("initial-block");
   const finalBlock = document.getElementById("final-block");
   if (initialBlock) initialBlock.style.display = "none";
@@ -323,7 +384,6 @@ async function runInputPlot() {
   const contigs = document.getElementById("contigs").files[0];
   const paths = document.getElementById("paths").files[0];
   const initial = document.getElementById("initial").files[0];
-  const graphbin = document.getElementById("graphbin").files[0];
 
   const setDpi = parseInt(document.getElementById("setting-dpi").value);
   const setWidth = parseInt(document.getElementById("setting-width").value);
@@ -332,9 +392,21 @@ async function runInputPlot() {
   const setLsize = parseInt(document.getElementById("setting-lsize").value);
   const setImgtype = document.getElementById("setting-imgtype").value;
   const setDelimiter = document.getElementById("setting-delimiter").value;
+  const setMaxIterRaw = parseInt(document.getElementById("setting-max-iter").value, 10);
+  const setDiffRaw = parseFloat(
+    document.getElementById("setting-diff-threshold").value
+  );
+  const setMaxIter =
+    Number.isFinite(setMaxIterRaw) && setMaxIterRaw > 0
+      ? setMaxIterRaw
+      : GRAPHBIN_DEFAULTS.max_iteration;
+  const setDiffThreshold =
+    Number.isFinite(setDiffRaw) && setDiffRaw >= 0
+      ? setDiffRaw
+      : GRAPHBIN_DEFAULTS.diff_threshold;
 
-  if (!graph || !contigs || !paths || !initial || !graphbin) {
-    log("Please pick all input files (graph, contigs, paths, initial, graphbin).");
+  if (!graph || !contigs || !paths || !initial) {
+    log("Please pick all input files (graph, contigs, paths, initial).");
     return;
   }
 
@@ -346,7 +418,58 @@ async function runInputPlot() {
   const contigsPath = await writeUploadedFile(pyodide, contigs, "/data/contigs.fasta");
   const pathsPath = await writeUploadedFile(pyodide, paths, "/data/contigs.paths");
   const initialPath = await writeUploadedFile(pyodide, initial, "/data/initial_binning.tsv");
-  const finalPath = await writeUploadedFile(pyodide, graphbin, "/data/final_binning.tsv");
+  const finalPath = "/out/graphbin_output.csv";
+
+  const graphbinArgs = {
+    graph: graphPath,
+    contigs: contigsPath,
+    paths: pathsPath,
+    binned: initialPath,
+    output: "/out/",
+    prefix: "",
+    delimiter: setDelimiter,
+    max_iteration: setMaxIter,
+    diff_threshold: setDiffThreshold,
+  };
+
+  log("Running GraphBin in Pyodide... This step can take a while for large files.");
+  resetGraphbinStatus("Running GraphBin...");
+
+  try {
+    await pyodide.runPythonAsync(`
+import json
+from types import SimpleNamespace
+import graphbin_SPAdes
+
+args_dict = json.loads(${JSON.stringify(JSON.stringify(graphbinArgs))})
+args_ns = SimpleNamespace(**args_dict)
+
+graphbin_SPAdes.run(args_ns)
+  `);
+  } catch (err) {
+    let status = "GraphBin failed. ";
+    try {
+      const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+      status += logText ? "\n" + logText : String(err);
+    } catch (e) {
+      status += String(err);
+    }
+    setGraphbinStatus(status.trim());
+    throw err;
+  }
+
+  if (!graphbinStatusHasLog) {
+    try {
+      const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+      if (logText && logText.trim().length > 0) {
+        setGraphbinStatus(logText);
+      } else {
+        setGraphbinStatus("GraphBin finished. Log file was empty.");
+      }
+    } catch (e) {
+      setGraphbinStatus("GraphBin finished. Log file not available.");
+    }
+  }
 
   const args = {
     initial: initialPath,
@@ -442,6 +565,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
    ========================= */
 async function runExamplePlot() {
   outputEl.textContent = "";
+  resetGraphbinStatus("(GraphBin logs will appear here)");
   const initialBlock = document.getElementById("initial-block");
   const finalBlock = document.getElementById("final-block");
   if (initialBlock) initialBlock.style.display = "none";
@@ -454,6 +578,18 @@ async function runExamplePlot() {
   const setLsize = parseInt(document.getElementById("setting-lsize").value);
   const setImgtype = document.getElementById("setting-imgtype").value;
   const setDelimiter = document.getElementById("setting-delimiter").value;
+  const setMaxIterRaw = parseInt(document.getElementById("setting-max-iter").value, 10);
+  const setDiffRaw = parseFloat(
+    document.getElementById("setting-diff-threshold").value
+  );
+  const setMaxIter =
+    Number.isFinite(setMaxIterRaw) && setMaxIterRaw > 0
+      ? setMaxIterRaw
+      : GRAPHBIN_DEFAULTS.max_iteration;
+  const setDiffThreshold =
+    Number.isFinite(setDiffRaw) && setDiffRaw >= 0
+      ? setDiffRaw
+      : GRAPHBIN_DEFAULTS.diff_threshold;
 
   const pyodide = await getPyodide();
 
@@ -471,7 +607,58 @@ async function runExamplePlot() {
     "data/initial_binning_res.csv",
     "/data/initial_binning.csv"
   );
-  const finalPath = await writeServerFile(pyodide, "data/graphbin_res.csv", "/data/final_binning.csv");
+  const finalPath = "/out/graphbin_output.csv";
+
+  const graphbinArgs = {
+    graph: graphPath,
+    contigs: contigsPath,
+    paths: pathsPath,
+    binned: initialPath,
+    output: "/out/",
+    prefix: "",
+    delimiter: setDelimiter,
+    max_iteration: setMaxIter,
+    diff_threshold: setDiffThreshold,
+  };
+
+  log("Running GraphBin on example data in Pyodide...");
+  resetGraphbinStatus("Running GraphBin...");
+
+  try {
+    await pyodide.runPythonAsync(`
+import json
+from types import SimpleNamespace
+import graphbin_SPAdes
+
+args_dict = json.loads(${JSON.stringify(JSON.stringify(graphbinArgs))})
+args_ns = SimpleNamespace(**args_dict)
+
+graphbin_SPAdes.run(args_ns)
+  `);
+  } catch (err) {
+    let status = "GraphBin failed. ";
+    try {
+      const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+      status += logText ? "\n" + logText : String(err);
+    } catch (e) {
+      status += String(err);
+    }
+    setGraphbinStatus(status.trim());
+    throw err;
+  }
+
+  if (!graphbinStatusHasLog) {
+    try {
+      const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+      if (logText && logText.trim().length > 0) {
+        setGraphbinStatus(logText);
+      } else {
+        setGraphbinStatus("GraphBin finished. Log file was empty.");
+      }
+    } catch (e) {
+      setGraphbinStatus("GraphBin finished. Log file not available.");
+    }
+  }
 
   const args = {
     initial: initialPath,
@@ -565,6 +752,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
    Buttons
    ========================= */
 document.getElementById("run-btn").addEventListener("click", () => {
+  resetGraphbinStatus("(GraphBin logs will appear here)");
   resetInteractiveViews();
   runInputPlot().catch((err) => {
     console.error(err);
@@ -573,6 +761,7 @@ document.getElementById("run-btn").addEventListener("click", () => {
 });
 
 document.getElementById("example-btn").addEventListener("click", () => {
+  resetGraphbinStatus("(GraphBin logs will appear here)");
   resetInteractiveViews();
   runExamplePlot().catch((err) => {
     console.error(err);
@@ -593,6 +782,8 @@ document.getElementById("download-final").addEventListener("click", () => {
     log("Download error: " + err);
   });
 });
+
+initCollapseToggles();
 
 /* =========================
    Download plot images
@@ -1097,6 +1288,56 @@ function attachControl(id, event, handler) {
   if (el.dataset._bound === "1") return;
   el.addEventListener(event, handler);
   el.dataset._bound = "1";
+}
+
+function initCollapseToggles() {
+  if (window.__collapseTogglesInitialized) return;
+  window.__collapseTogglesInitialized = true;
+  const storageKey = "graphbin-collapse-state";
+  const loadState = () => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  };
+  const saveState = (state) => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    } catch (e) {}
+  };
+
+  const applyInitialState = () => {
+    const state = loadState();
+    const buttons = document.querySelectorAll(".collapse-toggle");
+    buttons.forEach((btn) => {
+      const section = btn.closest(".tab-section");
+      if (!section) return;
+      const target = btn.dataset.target || "";
+      const collapsed = target === "section-output" ? false : !!state[target];
+      section.classList.toggle("collapsed", collapsed);
+      btn.textContent = collapsed ? "Expand" : "Collapse";
+      btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    });
+  };
+
+  applyInitialState();
+
+  document.addEventListener("click", (event) => {
+    const btn = event.target?.closest?.(".collapse-toggle");
+    if (!btn) return;
+    const section = btn.closest(".tab-section");
+    if (!section) return;
+    const collapsed = section.classList.toggle("collapsed");
+    btn.textContent = collapsed ? "Expand" : "Collapse";
+    btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+
+    const target = btn.dataset.target || "";
+    const state = loadState();
+    state[target] = collapsed;
+    saveState(state);
+  });
 }
 
 function resizeCanvasToDisplaySize() {
