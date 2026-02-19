@@ -1,5 +1,5 @@
 {
-  "name": "graphbin-visualise-wasm",
+  "name": "graphbin-viz",
   "private": true,
   "version": "0.1.0",
   "type": "module",

@@ -1,8 +1,8 @@
 # GraphBin-Viz: Interactive Visual Analytics for Exploring Graph-based Metagenomic Binning
 
-![GitHub License](https://img.shields.io/github/license/metagentools/graphbin-visualise-wasm)
-[![Unit Testing](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/vitest.yml/badge.svg)](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/vitest.yml)
-[![E2E Testing](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/playwright.yml/badge.svg)](https://github.com/metagentools/graphbin-visualise-wasm/actions/workflows/playwright.yml)
+![GitHub License](https://img.shields.io/github/license/metagentools/graphbin-viz)
+[![Unit Testing](https://github.com/metagentools/graphbin-viz/actions/workflows/vitest.yml/badge.svg)](https://github.com/metagentools/graphbin-viz/actions/workflows/vitest.yml)
+[![E2E Testing](https://github.com/metagentools/graphbin-viz/actions/workflows/playwright.yml/badge.svg)](https://github.com/metagentools/graphbin-viz/actions/workflows/playwright.yml)
 
 GraphBin-Viz is a **browser-based interactive visualisation tool** for comparing **initial metagenomic binning results** and **[GraphBin](https://github.com/metagentools/GraphBin)-refined binning results** on assembly graphs, including static plots, a fully interactive assembly graph view, and a Sankey diagram summarising contig reassignment between binning results. It runs GraphBin locally on your device using your uploaded data, and no data ever leaves your device.
 
@@ -12,7 +12,7 @@ This project uses Pyodide (Python compiled to WebAssembly) to run GraphBin, visu
 ## Web App (Anyone can use)
 
 🌐 Live demo:
-[metagentools.github.io/graphbin-visualise-wasm/](https://metagentools.github.io/graphbin-visualise-wasm/)
+[metagentools.github.io/graphbin-viz/](https://metagentools.github.io/graphbin-viz/)
 
 No installation needed! Python **not required**. Node.js **not required**. You only need a modern browser such as Chrome, Firefox, Safari or Edge.
 
@@ -99,8 +99,8 @@ This view provides a high-level summary of bin refinement behavior, complementin
 Clone the repository:
 
 ```shell
-git clone https://github.com/metagentools/graphbin-visualise-wasm.git
-cd graphbin-visualise-wasm
+git clone https://github.com/metagentools/graphbin-viz.git
+cd graphbin-viz
 ```
 
 Because the browser cannot fetch local files with `file:///`, you must serve it with a lightweight local server. You will need Python for this step.

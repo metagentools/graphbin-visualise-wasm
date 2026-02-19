@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  base: "/graphbin-visualise-wasm/",
+  base: "/graphbin-viz/",
   plugins: [react()],
   test: {
     environment: "jsdom",
