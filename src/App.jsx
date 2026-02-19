@@ -686,7 +686,7 @@ export default function App() {
                   <div id="flow-stat-changed" className="flow-stat-value">—</div>
                 </div>
                 <div className="flow-stat">
-                  <div className="flow-stat-label">Number of contigs re-assigned</div>
+                  <div className="flow-stat-label">Number of contigs re-assigned (Likely misbinned)</div>
                   <div id="flow-stat-reassigned" className="flow-stat-value">—</div>
                 </div>
                 <div className="flow-stat">

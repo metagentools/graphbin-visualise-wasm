@@ -107,6 +107,14 @@ def run(args):
 
     logger.info("GraphBin started")
 
+    def _is_unbinned(value):
+        if value is None:
+            return True
+        s = str(value).strip()
+        if s == "":
+            return True
+        return s.lower() == "unbinned"
+
     # Get the number of bins from the initial binning result
     # ---------------------------------------------------
 
@@ -155,7 +163,11 @@ def run(args):
     # Write misbinned contigs (changed bin between initial and final)
     misbinned = []
     for contig, init_label in initial_bin_by_contig.items():
+        if _is_unbinned(init_label):
+            continue
         final_label = final_bins.get(contig)
+        if _is_unbinned(final_label):
+            continue
         if final_label != init_label:
             misbinned.append(contig)
 

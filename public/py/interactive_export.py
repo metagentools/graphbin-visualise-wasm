@@ -156,15 +156,6 @@ def _read_misbinned(path, contigs_map_rev):
     return misbinned
 
 
-def _is_unbinned(value):
-    if value is None:
-        return True
-    s = str(value).strip()
-    if s == "":
-        return True
-    return s.lower() == "unbinned"
-
-
 def _read_ambiguous_multi(path, contigs_map_rev):
     ambiguous = set()
     if not path or not os.path.exists(path):
@@ -279,6 +270,11 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
     layout_coords = _load_layout_coords(layout_path) if layout_path and os.path.exists(layout_path) else None
     fallback_layout = None
 
+    misbinned_path = getattr(args_ns, "misbinned", None)
+    if not misbinned_path:
+        misbinned_path = f"{output_path}{prefix}graphbin_misbinned.csv"
+    misbinned = _read_misbinned(misbinned_path, contigs_map_rev)
+
     ambiguous_multi_path = getattr(args_ns, "ambiguous_multi", None)
     if not ambiguous_multi_path:
         ambiguous_multi_path = f"{output_path}{prefix}graphbin_ambiguous.csv"
@@ -303,7 +299,6 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
         init_bin = initial_bins.get(v)
         fin_bin = final_bins.get(v)
         changed = init_bin != fin_bin
-        misbinned = (not _is_unbinned(init_bin)) and changed
 
         if layout_coords and node_id in layout_coords:
             coord = layout_coords[node_id]
@@ -326,7 +321,7 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
             "changed": changed,
             "degree": int(deg[v]),
             "cov": float(covs[v]) if v in covs and covs[v] is not None else None,
-            "misbinned": misbinned,
+            "misbinned": v in misbinned,
             "ambiguous_multi": v in ambiguous_multi,
         })
 
