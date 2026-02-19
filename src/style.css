@@ -946,6 +946,14 @@ select:focus{
   border-radius: 5px;
 }
 
+.bin-legend-swatch.legend-ambiguous{
+  background: transparent;
+  border: 2px dotted #111827;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+
 .bin-legend-label{
   overflow: hidden;
   text-overflow: ellipsis;

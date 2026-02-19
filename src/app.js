@@ -90,6 +90,7 @@ let filters = {
   hideUnbinned: false,
   onlyChanged: false,
   hideIsolated: false,
+  showAmbiguousOutline: false,
   khopFrom: null, // node id or null
   khopK: 0,
   collapseTips: false,
@@ -229,6 +230,12 @@ function resetInteractiveViews() {
   const hideIsolated = document.getElementById("toggle-hide-isolated");
   if (hideIsolated) {
     hideIsolated.checked = false;
+  }
+
+  // Show ambiguous → unchecked
+  const showAmbiguousOutline = document.getElementById("toggle-show-ambiguous");
+  if (showAmbiguousOutline) {
+    showAmbiguousOutline.checked = false;
   }
 }
 
@@ -937,7 +944,8 @@ function renderBinLegend() {
 
   // Add unbinned
   el.appendChild(makeLegendRow("(unbinned)", "#d3d3d3"));
-  el.appendChild(makeLegendRow("Misbinned?", "#ef4444", "misbinned"));
+  el.appendChild(makeLegendRow("Likely misbinned", "#ef4444", "misbinned"));
+  el.appendChild(makeLegendRow("Ambiguous", "#111827", "ambiguous"));
 
   // bins in sorted order for consistency
   const entries = [...binColorMap.entries()].sort((a, b) =>
@@ -957,6 +965,9 @@ function makeLegendRow(label, color, variant = "solid") {
   sw.className = "bin-legend-swatch";
   if (variant === "misbinned") {
     sw.classList.add("legend-misbinned");
+    sw.style.borderColor = color;
+  } else if (variant === "ambiguous") {
+    sw.classList.add("legend-ambiguous");
     sw.style.borderColor = color;
   } else {
     sw.style.background = color;
@@ -1064,6 +1075,11 @@ function initInteractiveUI() {
   attachControl("toggle-hide-isolated", "change", (e) => {
     filters.hideIsolated = e.target.checked;
     invalidateDerived();
+    render();
+  });
+
+  attachControl("toggle-show-ambiguous", "change", (e) => {
+    filters.showAmbiguousOutline = e.target.checked;
     render();
   });
 
@@ -1584,6 +1600,7 @@ function isNodeVisible(n) {
     if (deg === 0) return false;
   }
 
+
   if (filters.khopFrom && filters.khopK >= 0) {
     if (!graphModel.khopSet) graphModel.khopSet = computeKHop(filters.khopFrom, filters.khopK);
     if (!graphModel.khopSet.has(n.id)) return false;
@@ -1668,6 +1685,7 @@ function formatTooltip(n) {
     <div>final: ${escapeHtml(fin)}</div>
     <div>shown: ${escapeHtml(shown)}</div>
     ${n.misbinned ? "<div>misbinned: yes</div>" : ""}
+    ${n.ambiguous_multi ? "<div>ambiguous: yes</div>" : ""}
     <div>adj bins: ${escapeHtml(mix || "n/a")}</div>
   `;
 }
@@ -1817,9 +1835,20 @@ function render() {
       ctx.save();
       ctx.beginPath();
       ctx.arc(n.x, n.y, r + (2 / t.k), 0, Math.PI * 2);
-      ctx.lineWidth = 2 / t.k;
+      ctx.lineWidth = 3 / t.k;
       ctx.setLineDash([2 / t.k, 2 / t.k]);
       ctx.strokeStyle = "#ef4444";
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    if (filters.mode === "initial" && n.ambiguous_multi && filters.showAmbiguousOutline) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r + (5 / t.k), 0, Math.PI * 2);
+      ctx.lineWidth = 2 / t.k;
+      ctx.setLineDash([1 / t.k, 3 / t.k]);
+      ctx.strokeStyle = "#111827";
       ctx.stroke();
       ctx.restore();
     }

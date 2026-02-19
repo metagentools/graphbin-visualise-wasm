@@ -125,7 +125,7 @@ def run(args):
     # Run GraphBin logic
     # -------------------------------------
 
-    final_bins, remove_labels, non_isolated, misbinned = graphbin_main(
+    final_bins, remove_labels, non_isolated, misbinned, ambiguous = graphbin_main(
         n_bins,
         bins,
         bins_list,
@@ -140,16 +140,6 @@ def run(args):
     # Print elapsed time for the process
     logger.info(f"Elapsed time: {elapsed_time} seconds")
 
-    # Write ambiguous contigs removed during refinement
-    ambiguous_path = f"{output_path}{prefix}graphbin_ambiguous.csv"
-    try:
-        with open(ambiguous_path, "w", encoding="utf-8") as f:
-            for contig in sorted(set(remove_labels)):
-                f.write(f"{contig_names[contig]}\n")
-        logger.info(f"Ambiguous contigs can be found at {ambiguous_path}")
-    except Exception as err:
-        logger.warning(f"Failed to write ambiguous contigs file: {err}")
-
     # Write misbinned contigs (all labelled neighbours in different bins)
     misbinned_path = f"{output_path}{prefix}graphbin_misbinned.csv"
     try:
@@ -159,6 +149,16 @@ def run(args):
         logger.info(f"Misbinned contigs can be found at {misbinned_path}")
     except Exception as err:
         logger.warning(f"Failed to write misbinned contigs file: {err}")
+
+    # Write ambiguous contigs (>=2 labelled neighbours in different bins, not misbinned)
+    ambiguous_path = f"{output_path}{prefix}graphbin_ambiguous.csv"
+    try:
+        with open(ambiguous_path, "w", encoding="utf-8") as f:
+            for contig in sorted(set(ambiguous)):
+                f.write(f"{contig_names[contig]}\n")
+        logger.info(f"Ambiguous contigs can be found at {ambiguous_path}")
+    except Exception as err:
+        logger.warning(f"Failed to write ambiguous contigs file: {err}")
 
     # Write result to output file
     # -----------------------------

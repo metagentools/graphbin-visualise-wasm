@@ -138,24 +138,6 @@ def _read_binning(path, delimiter, contigs_map_rev):
     return bins
 
 
-def _read_ambiguous(path, contigs_map_rev):
-    ambiguous = set()
-    if not path or not os.path.exists(path):
-        return ambiguous
-    with open(path, "r", encoding="utf-8", errors="ignore") as f:
-        for line in f:
-            label = line.strip()
-            if not label:
-                continue
-            try:
-                contig_num = _extract_contig_num(label)
-                idx = contigs_map_rev[int(contig_num)]
-                ambiguous.add(idx)
-            except Exception:
-                continue
-    return ambiguous
-
-
 def _read_misbinned(path, contigs_map_rev):
     misbinned = set()
     if not path or not os.path.exists(path):
@@ -172,6 +154,24 @@ def _read_misbinned(path, contigs_map_rev):
             except Exception:
                 continue
     return misbinned
+
+
+def _read_ambiguous_multi(path, contigs_map_rev):
+    ambiguous = set()
+    if not path or not os.path.exists(path):
+        return ambiguous
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            label = line.strip()
+            if not label:
+                continue
+            try:
+                contig_num = _extract_contig_num(label)
+                idx = contigs_map_rev[int(contig_num)]
+                ambiguous.add(idx)
+            except Exception:
+                continue
+    return ambiguous
 
 
 def _read_fasta_len_gc(contigs_fasta, contigs_map_rev):
@@ -270,15 +270,15 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
     layout_coords = _load_layout_coords(layout_path) if layout_path and os.path.exists(layout_path) else None
     fallback_layout = None
 
-    ambiguous_path = getattr(args_ns, "ambiguous", None)
-    if not ambiguous_path:
-        ambiguous_path = f"{output_path}{prefix}graphbin_ambiguous.csv"
-    ambiguous = _read_ambiguous(ambiguous_path, contigs_map_rev)
-
     misbinned_path = getattr(args_ns, "misbinned", None)
     if not misbinned_path:
         misbinned_path = f"{output_path}{prefix}graphbin_misbinned.csv"
     misbinned = _read_misbinned(misbinned_path, contigs_map_rev)
+
+    ambiguous_multi_path = getattr(args_ns, "ambiguous_multi", None)
+    if not ambiguous_multi_path:
+        ambiguous_multi_path = f"{output_path}{prefix}graphbin_ambiguous.csv"
+    ambiguous_multi = _read_ambiguous_multi(ambiguous_multi_path, contigs_map_rev)
 
     # --- EXACT SAME BIN COLOURS AS PNG PLOTS ---
     all_bins = []
@@ -320,8 +320,8 @@ def export(args_ns: SimpleNamespace, out_json="/out/interactive_graph.json"):
             "changed": init_bin != fin_bin,
             "degree": int(deg[v]),
             "cov": float(covs[v]) if v in covs and covs[v] is not None else None,
-            "ambiguous": v in ambiguous,
             "misbinned": v in misbinned,
+            "ambiguous_multi": v in ambiguous_multi,
         })
 
     # edges (use NODE_ ids, not vertex indices)

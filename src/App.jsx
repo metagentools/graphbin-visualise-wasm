@@ -485,7 +485,7 @@ export default function App() {
                   </div>
 
                   <div className="form-row">
-                    <label htmlFor="toggle-hide-unbinned">Hide unbinned</label>
+                    <label htmlFor="toggle-hide-unbinned">Hide unbinned contigs</label>
                     <div className="control">
                       <label className="cb">
                         <input id="toggle-hide-unbinned" type="checkbox" />
@@ -509,6 +509,16 @@ export default function App() {
                     <div className="control">
                       <label className="cb">
                         <input id="toggle-hide-isolated" type="checkbox" />
+                        <span className="cb-box" aria-hidden="true"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <label htmlFor="toggle-show-ambiguous">Highlight ambiguous contigs</label>
+                    <div className="control">
+                      <label className="cb">
+                        <input id="toggle-show-ambiguous" type="checkbox" />
                         <span className="cb-box" aria-hidden="true"></span>
                       </label>
                     </div>
