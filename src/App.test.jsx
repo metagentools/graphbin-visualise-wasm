@@ -5,7 +5,7 @@ test("renders main header and tabs", () => {
   render(<App />);
 
   expect(
-    screen.getByRole("heading", { name: /GraphBin Visualise Wasm/i })
+    screen.getByRole("heading", { name: /GraphBin-Viz/i })
   ).toBeInTheDocument();
 
   expect(screen.getByRole("tab", { name: /Output \+ Plots/i })).toBeInTheDocument();

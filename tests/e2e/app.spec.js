@@ -4,7 +4,7 @@ test("interactive controls are available", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: /GraphBin Visualise Wasm/i })
+    page.getByRole("heading", { name: /GraphBin-Viz/i })
   ).toBeVisible();
 
   await page.getByRole("tab", { name: /Interactive View/i }).click();
