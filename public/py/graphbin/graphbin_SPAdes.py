@@ -122,10 +122,16 @@ def run(args):
         n_bins, bins_list, contig_bins_file, contigs_map.inverse, delimiter
     )
 
+    initial_bin_by_contig = {}
+    for idx, contigs in enumerate(bins):
+        label = bins_list[idx]
+        for contig in contigs:
+            initial_bin_by_contig[contig] = label
+
     # Run GraphBin logic
     # -------------------------------------
 
-    final_bins, remove_labels, non_isolated, misbinned, ambiguous = graphbin_main(
+    final_bins, remove_labels, non_isolated, _lp_misbinned, ambiguous = graphbin_main(
         n_bins,
         bins,
         bins_list,
@@ -140,7 +146,13 @@ def run(args):
     # Print elapsed time for the process
     logger.info(f"Elapsed time: {elapsed_time} seconds")
 
-    # Write misbinned contigs (all labelled neighbours in different bins)
+    # Write misbinned contigs (changed bin between initial and final)
+    misbinned = []
+    for contig, init_label in initial_bin_by_contig.items():
+        final_label = final_bins.get(contig)
+        if final_label != init_label:
+            misbinned.append(contig)
+
     misbinned_path = f"{output_path}{prefix}graphbin_misbinned.csv"
     try:
         with open(misbinned_path, "w", encoding="utf-8") as f:
