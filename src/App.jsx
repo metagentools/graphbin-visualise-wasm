@@ -417,17 +417,17 @@ export default function App() {
                 </div>
               </div>
               <div id="section-output" className="section-body">
-                <div id="output">(logs will appear here)</div>
+                <div id="output" className="output-box">(logs will appear here)</div>
                 <div className="status-card">
                   <div className="status-title">GraphBin status</div>
-                  <div id="graphbin-status" className="status-log">
+                  <div id="graphbin-status" className="status-log output-box">
                     (GraphBin logs will appear here)
                   </div>
                 </div>
-                <button id="download-graphbin" className="btn tertiary">
-                  Download GraphBin output (ZIP)
-                </button>
               </div>
+              <button id="download-graphbin" className="btn primary">
+                Download GraphBin output (ZIP)
+              </button>
             </div>
 
             <div className="tab-section">
@@ -563,7 +563,7 @@ export default function App() {
                   <div>Click: lock selection</div>
                 </div>
 
-                <div className="legend-title">Bin legend</div>
+                <div className="settings-title legend-title">Bin legend</div>
                 <div id="bin-legend" className="bin-legend"></div>
               </div>
 

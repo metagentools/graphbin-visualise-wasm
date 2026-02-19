@@ -22,14 +22,16 @@
   --accent-2: #22c55e;
   --accent-3: #f59e0b;
   --input-bg: #ffffff;
-  --output-bg: #0b1220;
-  --output-text: #e2e8f0;
+  --output-bg: #f8fafc;
+  --output-text: #0f172a;
+  --output-border: #d6deea;
+  --output-shadow: rgba(15, 23, 42, 0.08);
   --plot-bg: #ffffff;
   --plot-text: #0f172a;
   --plot-border: #e2e8f0;
   --plot-pill-bg: #f1f5f9;
   --plot-pill-border: #e2e8f0;
-  --flow-panel-height: 720px;
+  --flow-panel-height: 780px;
 }
 
 :root[data-theme="dark"]{
@@ -50,7 +52,9 @@
   --accent-3: #fbbf24;
   --input-bg: #0b1322;
   --output-bg: #0b1220;
-  --output-text: #d1d5db;
+  --output-text: #e2e8f0;
+  --output-border: #1f2a3a;
+  --output-shadow: rgba(0, 0, 0, 0.55);
   --plot-bg: #ffffff;
   --plot-text: #0f172a;
   --plot-border: #e2e8f0;
@@ -688,7 +692,7 @@ select:focus{
 }
 
 /* Log / output area */
-#output {
+.output-box {
   font-family: Menlo, Consolas, "Courier New", monospace;
   font-size: 13px;
   background: var(--output-bg);
@@ -696,20 +700,20 @@ select:focus{
   white-space: pre-wrap;
   overflow-y: auto;
   min-height: 150px;
-  max-height: 250px;
+  max-height: 260px;
   border-radius: 10px;
   padding: 0.85rem;
-  border: 1px solid var(--border);
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--output-border);
+  box-shadow: inset 0 0 10px var(--output-shadow);
 }
 
 .status-card{
   display: grid;
   gap: 8px;
-  padding: 12px 12px 10px;
-  border-radius: 12px;
-  border: 1px dashed var(--border);
-  background: var(--panel-alt);
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
 }
 
 .status-title{
@@ -721,17 +725,7 @@ select:focus{
 }
 
 .status-log{
-  font-family: Menlo, Consolas, "Courier New", monospace;
-  font-size: 12px;
   line-height: 1.45;
-  white-space: pre-wrap;
-  max-height: 200px;
-  overflow-y: auto;
-  border-radius: 10px;
-  padding: 0.7rem 0.75rem;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--text);
 }
 
 /* Make sure app stays readable on very small screens */
@@ -906,7 +900,7 @@ select:focus{
 }
 
 .legend-title{
-  margin-top: 14px;
+  margin-top: 20px;
   font-weight: 600;
   color: var(--text);
 }
