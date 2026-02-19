@@ -85,7 +85,7 @@ let sankeyLocked = null; // {srcBin, dstBin} or null
 
 // filters
 let filters = {
-  mode: "final", // "initial" or "final"
+  mode: "initial", // "initial" or "final"
   binOnly: "", // "" = all
   hideUnbinned: false,
   onlyChanged: false,
@@ -195,10 +195,10 @@ function resetInteractiveViews() {
    * Reset controls to defaults
    * ============================= */
 
-  // Binning to display → GraphBin (final)
+  // Binning to display → Initial
   const viewMode = document.getElementById("view-mode");
   if (viewMode) {
-    viewMode.value = "final";
+    viewMode.value = "initial";
   }
 
   // Bin filter → (all bins)

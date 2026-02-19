@@ -504,9 +504,9 @@ export default function App() {
               <div className="interactive-controls">
                 <div className="form-grid">
                   <div className="form-row">
-                    <label htmlFor="view-mode">Binning to display</label>
+                  <label htmlFor="view-mode">Binning to display</label>
                     <div className="control">
-                      <select id="view-mode" defaultValue="final">
+                      <select id="view-mode" defaultValue="initial">
                         <option value="initial">Initial</option>
                         <option value="final">GraphBin</option>
                       </select>

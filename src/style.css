@@ -1064,6 +1064,7 @@ select:focus{
   gap: 10px;
   user-select: none;
   cursor: pointer;
+  min-height: 28px;
 }
 
 .cb input{
@@ -1073,8 +1074,8 @@ select:focus{
 }
 
 .cb-box{
-  width: 20px;
-  height: 44px;
+  width: 22px;
+  height: 22px;
   border-radius: 6px;
   border: 1.5px solid var(--border);
   background: var(--input-bg);
@@ -1086,8 +1087,8 @@ select:focus{
 /* checkmark */
 .cb-box::after{
   content: "";
-  width: 10px;
-  height: 6px;
+  width: 11px;
+  height: 7px;
   border-left: 2px solid #fff;
   border-bottom: 2px solid #fff;
   transform: rotate(-45deg) scale(0);
