@@ -690,7 +690,14 @@ export default function App() {
         >
           Vijini M
         </a>{" "}
-        @ Flinders University
+        @{" "}
+        <a
+          href="https://github.com/metagentools"
+          target="_blank"
+          rel="noreferrer"
+        >
+          metagentools
+        </a>
       </footer>
     </div>
   );
