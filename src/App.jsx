@@ -424,6 +424,9 @@ export default function App() {
                     (GraphBin logs will appear here)
                   </div>
                 </div>
+                <button id="download-graphbin" className="btn tertiary">
+                  Download GraphBin output (ZIP)
+                </button>
               </div>
             </div>
 

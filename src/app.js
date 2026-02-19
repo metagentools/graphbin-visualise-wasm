@@ -63,6 +63,7 @@ let pyodideReady = null;
 // Track last generated plot paths for download
 let lastInitialImgPath = null;
 let lastFinalImgPath = null;
+let lastGraphbinZipPath = null;
 
 /* =========================
    Interactive graph globals
@@ -783,6 +784,13 @@ document.getElementById("download-final").addEventListener("click", () => {
   });
 });
 
+document.getElementById("download-graphbin").addEventListener("click", () => {
+  downloadGraphbinOutputZip().catch((err) => {
+    console.error(err);
+    log("Download error: " + err);
+  });
+});
+
 initCollapseToggles();
 
 /* =========================
@@ -807,6 +815,56 @@ async function downloadImage(which) {
   const a = document.createElement("a");
   a.href = url;
   a.download = which + "_plot.png";
+  a.style.display = "none";
+  document.body.appendChild(a);
+
+  a.click();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }, 2000);
+}
+
+async function downloadGraphbinOutputZip() {
+  const pyodide = await getPyodide();
+  const zipPath = "/out/graphbin_output.zip";
+  lastGraphbinZipPath = zipPath;
+
+  try {
+    const files = pyodide.FS.readdir("/out").filter((f) => ![".", ".."].includes(f));
+    if (files.length === 0) {
+      alert("GraphBin output not available. Run GraphBin first.");
+      return;
+    }
+  } catch (e) {
+    alert("GraphBin output not available. Run GraphBin first.");
+    return;
+  }
+
+  await pyodide.runPythonAsync(`
+import os, zipfile
+out_dir = "/out"
+zip_path = "${zipPath}"
+if os.path.exists(zip_path):
+    os.remove(zip_path)
+with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+    for root, dirs, files in os.walk(out_dir):
+        for name in files:
+            full = os.path.join(root, name)
+            if full == zip_path:
+                continue
+            arc = os.path.relpath(full, out_dir)
+            z.write(full, arcname=arc)
+  `);
+
+  const data = pyodide.FS.readFile(zipPath);
+  const blob = new Blob([data], { type: "application/zip" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "graphbin_output.zip";
   a.style.display = "none";
   document.body.appendChild(a);
 
