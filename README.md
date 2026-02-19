@@ -18,6 +18,12 @@ No installation needed! Python **not required**. Node.js **not required**. You o
 
 ## Features
 
+### GraphBin bin-refinement
+
+* Run GraphBin on your device using WebAssembly
+* No shell installations needed
+* Upload your own data and run
+
 ### Static Graph Plots
 
 * Run GraphBin plotting fully in the browser using WebAssembly
@@ -44,6 +50,7 @@ No installation needed! Python **not required**. Node.js **not required**. You o
   * Coverage
   * Degree
   * Bin assignments
+  * Likely misbinned or ambigous
 * Zoom, pan, and explore complex graphs visually
 * Toggle visibility of bins and contigs
 * Designed for exploratory analysis and quality assessment
@@ -76,7 +83,7 @@ This view provides a high-level summary of bin refinement behavior, complementin
 ## Technologies Used
 
 * Pyodide (Python → WebAssembly)
-* igraph (graph processing + plotting)
+* igraph (GraphBin + graph processing + plotting)
 * matplotlib (Pyodide backend) for static image generation
 * React (UI framework)
 * Vite (build tooling)
