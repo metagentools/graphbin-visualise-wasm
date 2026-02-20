@@ -137,47 +137,58 @@ export default function App() {
           Binning
         </div>
         <div className="intro-row">
-          <p className="subtitle">
-            Refine your metagenomic binning results with{" "}
-            <a
-              href="https://github.com/metagentools/GraphBin"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GraphBin
-            </a>{" "}
-            directly in your browser. You can visualise and compare the
-            binning results using the provided interactive views.
-            <br />
-            GraphBin runs locally on your device using your uploaded assembly
-            graph + initial binning, and no data ever leaves your device.
-            <br />
-            You can load your own data (click on the tooltips for more
-            information about the files to be uploaded) and click{" "}
-            <b>Plot binning results</b>, or click <b>Run example data</b> to see
-            how it works on the provided example data.
-          </p>
-          <div className="intro-logo">
-            <a
-              href="https://github.com/metagentools/GraphBin"
-              target="_blank"
-              rel="noreferrer"
-              className="logo-link"
-              aria-label="GraphBin on GitHub"
-            >
-              <span className="logo-swap" aria-hidden="true">
-                <img
-                  src={`${baseUrl}GraphBin_logo_light.png`}
-                  alt=""
-                  className="graphbin-logo logo-light"
-                />
-                <img
-                  src={`${baseUrl}GraphBin_logo_dark.png`}
-                  alt=""
-                  className="graphbin-logo logo-dark"
-                />
-              </span>
-            </a>
+          <div className="subtitle intro-copy">
+            <div className="intro-card">
+              <p className="intro-lede">
+                Refine and visualize your metagenomic binning results with{" "}
+                <a
+                  href="https://github.com/metagentools/GraphBin"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  GraphBin
+                </a>{" "}
+                directly in your browser.
+              </p>
+              <p className="intro-body">
+                You can visualise and compare the binning results using the provided interactive views.
+                GraphBin runs locally on your device using your uploaded assembly graph + contigs +
+                initial binning result, and no data ever leaves your device.
+              </p>
+              <div className="intro-features" role="list">
+                <span className="intro-logo-inline" role="listitem">
+                  <a
+                    href="https://github.com/metagentools/GraphBin"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="logo-link"
+                    aria-label="GraphBin on GitHub"
+                  >
+                    <span className="logo-swap" aria-hidden="true">
+                      <img
+                        src={`${baseUrl}GraphBin_logo_light.png`}
+                        alt=""
+                        className="graphbin-logo logo-light"
+                      />
+                      <img
+                        src={`${baseUrl}GraphBin_logo_dark.png`}
+                        alt=""
+                        className="graphbin-logo logo-dark"
+                      />
+                    </span>
+                  </a>
+                </span>
+                <span className="intro-chip" role="listitem">Assembly graph visualization</span>
+                <span className="intro-chip" role="listitem">Interactive comparisons</span>
+                <span className="intro-chip" role="listitem">Local execution</span>
+                <span className="intro-chip" role="listitem">No data leaves your machine</span>
+              </div>
+              <p className="intro-cta">
+                You can load your own data (click on the tooltips for more information about the files
+                to be uploaded) and click <b>Plot binning results</b>, or click{" "}
+                <b>Run example data</b> to see how it works on the provided example data.
+              </p>
+            </div>
           </div>
         </div>
       </header>
@@ -349,7 +360,7 @@ export default function App() {
                     <details className="help" role="group">
                       <summary aria-label="Max Iterations help">?</summary>
                       <span className="help-tooltip" role="tooltip">
-                        Maximum number of interations for the label propagation
+                        Maximum number of iterations for the label propagation
                       </span>
                     </details>
                   </div>
