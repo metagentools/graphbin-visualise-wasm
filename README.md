@@ -88,11 +88,10 @@ This view provides a high-level summary of bin refinement behavior, complementin
 * matplotlib (Pyodide backend) for static image generation
 * React (UI framework)
 * Vite (build tooling)
-* JavaScript (ES6) application logic
-* D3.js (Sankey + zoom interactions)
-* Canvas API (interactive network rendering)
+* D3.js (interactive visualization + Sankey)
 * HTML5/CSS3 user interface
-* [GraphBin plotting logic](https://github.com/metagentools/GraphBin/tree/develop/src/graphbin/support)
+* Vitest (unit testing)
+* Playwright (E2E testing)
 
 ## Running the App Locally (Advanced)
 
