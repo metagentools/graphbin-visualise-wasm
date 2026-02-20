@@ -44,7 +44,7 @@ def generate_distinct_colours(bins: int):
 
 
 
-def draw_graph_with_matplotlib(graph, out_name, visual_style, dpi=300, width=2000, height=2000):
+def draw_graph_with_matplotlib(graph, out_name, visual_style, dpi=300, width=2000, height=2000, image_type="png"):
     """
     Draw an igraph graph using matplotlib backend instead of cairo.
 
@@ -56,7 +56,8 @@ def draw_graph_with_matplotlib(graph, out_name, visual_style, dpi=300, width=200
 
     fig, ax = plt.subplots(figsize=(fig_width_in, fig_height_in), dpi=dpi)
     ig_plot(graph, target=ax, **visual_style)
-    fig.savefig(out_name, dpi=dpi, bbox_inches="tight")
+    save_kwargs = {"dpi": dpi, "bbox_inches": "tight"}
+    fig.savefig(out_name, **save_kwargs)
     plt.close(fig)
 
 def write_layout_json(layout, contigs_map, output_path, prefix):
@@ -324,8 +325,12 @@ def run(args):
     visual_style["bbox"] = (width, height)
     visual_style["margin"] = margin
 
-    # Set vertex size
-    visual_style["vertex_size"] = vsize
+    # Set vertex size (points for SVG/PDF with matplotlib backend)
+    if image_type == "png":
+        visual_style["vertex_size"] = vsize
+    else:
+        vsize_points = (vsize * 72.0) / dpi
+        visual_style["vertex_size"] = vsize_points
 
     # Set vertex lable size
     visual_style["vertex_label_size"] = lsize
@@ -348,6 +353,7 @@ def run(args):
         dpi=dpi,
         width=width,
         height=height,
+        image_type=image_type,
     )
 
     # Get the final GraphBin binning result
@@ -400,8 +406,12 @@ def run(args):
     visual_style["bbox"] = (width, height)
     visual_style["margin"] = margin
 
-    # Set vertex size
-    visual_style["vertex_size"] = vsize
+    # Set vertex size (points for SVG/PDF with matplotlib backend)
+    if image_type == "png":
+        visual_style["vertex_size"] = vsize
+    else:
+        vsize_points = (vsize * 72.0) / dpi
+        visual_style["vertex_size"] = vsize_points
 
     # Set vertex lable size
     visual_style["vertex_label_size"] = lsize
@@ -420,4 +430,5 @@ def run(args):
         dpi=args.dpi,
         width=args.width,
         height=args.height,
+        image_type=image_type,
     )

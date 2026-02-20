@@ -911,6 +911,14 @@ select:focus{
   background: var(--plot-bg);
 }
 
+.plot-block .plot-pdf{
+  width: 100%;
+  min-height: 520px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--plot-bg);
+}
+
 /* Stack plots on narrow screens */
 @media (max-width: 800px) {
   #plots-row {

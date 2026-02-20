@@ -546,6 +546,12 @@ export default function App() {
                 <div id="plots-row">
                   <div className="plot-block" id="initial-block" style={{ display: "none" }}>
                     <img id="initial-img" alt="Initial binning plot" />
+                    <iframe
+                      id="initial-pdf"
+                      title="Initial binning plot (PDF)"
+                      className="plot-pdf"
+                      style={{ display: "none" }}
+                    />
                     <button id="download-initial" className="btn tertiary">
                       Download initial binning result plot
                     </button>
@@ -553,6 +559,12 @@ export default function App() {
 
                   <div className="plot-block" id="final-block" style={{ display: "none" }}>
                     <img id="final-img" alt="GraphBin binning plot" />
+                    <iframe
+                      id="final-pdf"
+                      title="GraphBin binning plot (PDF)"
+                      className="plot-pdf"
+                      style={{ display: "none" }}
+                    />
                     <button id="download-final" className="btn tertiary">
                       Download GraphBin binning result plot
                     </button>

@@ -371,10 +371,46 @@ function readTextFromPyodide(pyodide, path) {
   return pyodide.FS.readFile(path, { encoding: "utf8" });
 }
 
-function fileToImgSrc(pyodide, path) {
+function getFileExtension(path) {
+  const match = String(path || "").match(/\.([a-z0-9]+)$/i);
+  return match ? match[1].toLowerCase() : "";
+}
+
+function mimeForExtension(ext) {
+  if (ext === "png") return "image/png";
+  if (ext === "svg") return "image/svg+xml";
+  if (ext === "pdf") return "application/pdf";
+  return "application/octet-stream";
+}
+
+function fileToObjectUrl(pyodide, path) {
+  const ext = getFileExtension(path);
   const data = pyodide.FS.readFile(path); // Uint8Array
-  const blob = new Blob([data], { type: "image/png" });
+  const blob = new Blob([data], { type: mimeForExtension(ext) });
   return URL.createObjectURL(blob);
+}
+
+function setPlotMedia(pyodide, which, path) {
+  const ext = getFileExtension(path);
+  const img = document.getElementById(`${which}-img`);
+  const pdf = document.getElementById(`${which}-pdf`);
+  const url = fileToObjectUrl(pyodide, path);
+  if (ext === "pdf") {
+    if (img) img.style.display = "none";
+    if (pdf) {
+      pdf.style.display = "block";
+      pdf.src = url;
+    }
+  } else {
+    if (pdf) {
+      pdf.style.display = "none";
+      pdf.src = "";
+    }
+    if (img) {
+      img.style.display = "block";
+      img.src = url;
+    }
+  }
 }
 
 /* =========================
@@ -527,18 +563,19 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
 
   log("Python finished, reading plots from /out...");
 
-  const pngs = pyodide.FS.readdir("/out").filter((f) => f.endsWith(".png"));
-  log("Output files: " + pngs.join(", "));
+  const ext = (setImgtype || "png").toLowerCase();
+  const images = pyodide.FS.readdir("/out").filter((f) => f.endsWith("." + ext));
+  log("Output files: " + images.join(", "));
 
-  const initialFile = pngs.find((f) => f.includes("initial_binning_result"));
-  const finalFile = pngs.find((f) => f.includes("final_GraphBin_binning_result"));
+  const initialFile = images.find((f) => f.includes("initial_binning_result"));
+  const finalFile = images.find((f) => f.includes("final_GraphBin_binning_result"));
 
   lastInitialImgPath = null;
   lastFinalImgPath = null;
 
   if (initialFile) {
     const fullPath = "/out/" + initialFile;
-    document.getElementById("initial-img").src = fileToImgSrc(pyodide, fullPath);
+    setPlotMedia(pyodide, "initial", fullPath);
     if (initialBlock) initialBlock.style.display = "flex";
     lastInitialImgPath = fullPath;
   } else {
@@ -547,7 +584,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
 
   if (finalFile) {
     const fullPath = "/out/" + finalFile;
-    document.getElementById("final-img").src = fileToImgSrc(pyodide, fullPath);
+    setPlotMedia(pyodide, "final", fullPath);
     if (finalBlock) finalBlock.style.display = "flex";
     lastFinalImgPath = fullPath;
   } else {
@@ -728,18 +765,19 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
 
   log("Python finished, reading example plots from /out...");
 
-  const pngs = pyodide.FS.readdir("/out").filter((f) => f.endsWith(".png"));
-  log("Output files: " + pngs.join(", "));
+  const ext = (setImgtype || "png").toLowerCase();
+  const images = pyodide.FS.readdir("/out").filter((f) => f.endsWith("." + ext));
+  log("Output files: " + images.join(", "));
 
-  const initialFile = pngs.find((f) => f.includes("initial_binning_result"));
-  const finalFile = pngs.find((f) => f.includes("final_GraphBin_binning_result"));
+  const initialFile = images.find((f) => f.includes("initial_binning_result"));
+  const finalFile = images.find((f) => f.includes("final_GraphBin_binning_result"));
 
   lastInitialImgPath = null;
   lastFinalImgPath = null;
 
   if (initialFile) {
     const fullPath = "/out/" + initialFile;
-    document.getElementById("initial-img").src = fileToImgSrc(pyodide, fullPath);
+    setPlotMedia(pyodide, "initial", fullPath);
     if (initialBlock) initialBlock.style.display = "flex";
     lastInitialImgPath = fullPath;
   } else {
@@ -748,7 +786,7 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
 
   if (finalFile) {
     const fullPath = "/out/" + finalFile;
-    document.getElementById("final-img").src = fileToImgSrc(pyodide, fullPath);
+    setPlotMedia(pyodide, "final", fullPath);
     if (finalBlock) finalBlock.style.display = "flex";
     lastFinalImgPath = fullPath;
   } else {
@@ -840,13 +878,14 @@ async function downloadImage(which) {
     return;
   }
 
+  const ext = getFileExtension(path) || "png";
   const data = pyodide.FS.readFile(path);
-  const blob = new Blob([data], { type: "image/png" });
+  const blob = new Blob([data], { type: mimeForExtension(ext) });
 
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = which + "_plot.png";
+  a.download = which + "_plot." + ext;
   a.style.display = "none";
   document.body.appendChild(a);
 
