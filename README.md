@@ -23,7 +23,7 @@ No installation needed! Python **not required**. Node.js **not required**. You o
 * Run GraphBin on your device using WebAssembly
 * No shell installations needed
 * Upload your own data and run
-* Supports SPAdes assembler layout (GFA, contigs FASTA, contig paths)
+* Supports SPAdes assemblies (GFA, contigs FASTA and contig paths) and MEGAHIT assemblies (converted GFA, contigs FASTA)
 * Upload initial binning result and assembly files
 * Adjust GraphBin settings
 
