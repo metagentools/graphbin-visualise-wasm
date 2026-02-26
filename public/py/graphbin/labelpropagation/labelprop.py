@@ -129,7 +129,7 @@ class LabelProp:
     #   Label Propagation
     ################################################################################
 
-    def debug(self):
+    def debug(self, include_scores=False):
         labels = []
         for label in self.label_index_map.keys():
             labels.insert(int(self.label_index_map[label]), label)
@@ -145,7 +145,8 @@ class LabelProp:
                 if f_val > max_f_val:
                     max_f_val = f_val
                     max_f_val_idx = i
-                im_ans.append([labels[i], arr[i]])
+                if include_scores:
+                    im_ans.append([labels[i], arr[i]])
 
             im_ans.insert(1, labels[max_f_val_idx])
             ans.append(im_ans)
@@ -200,7 +201,9 @@ class LabelProp:
         if show_log:
             self.show_detail(diff, eps, i, max_iter)
 
-        ans = self.debug()
+        # Return compact results by default: [vertex_id, best_label]
+        # Detailed per-label score vectors are built only when explicitly required.
+        ans = self.debug(include_scores=clean_result)
 
         if clean_result:
             rtn_cleaned = []
