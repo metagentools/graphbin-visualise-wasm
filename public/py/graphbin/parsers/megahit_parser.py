@@ -61,17 +61,48 @@ def get_initial_binning_result(
     logger.info("Obtaining the initial binning result")
 
     bins = [[] for x in range(n_bins)]
+    missing_contig_ids = []
+    max_examples = 5
 
     try:
         with open(contig_bins_file) as contig_bins:
             readCSV = csv.reader(contig_bins, delimiter=delimiter)
             for row in readCSV:
-                contig_num = contigs_map_rev[graph_to_contig_map_rev[row[0]]]
+                if not row or len(row) < 2:
+                    continue
 
-                bin_num = bins_list.index(row[1])
+                contig_name = row[0].strip()
+                bin_name = row[1].strip()
+
+                if contig_name not in graph_to_contig_map_rev:
+                    if len(missing_contig_ids) < max_examples:
+                        missing_contig_ids.append(contig_name)
+                    continue
+
+                graph_contig_num = graph_to_contig_map_rev[contig_name]
+                if graph_contig_num not in contigs_map_rev:
+                    if len(missing_contig_ids) < max_examples:
+                        missing_contig_ids.append(contig_name)
+                    continue
+
+                contig_num = contigs_map_rev[graph_contig_num]
+
+                bin_num = bins_list.index(bin_name)
                 bins[bin_num].append(contig_num)
 
+        if missing_contig_ids:
+            examples = ", ".join(missing_contig_ids)
+            msg = (
+                "Input mismatch: some contig IDs in the initial binning result were not found "
+                "in the provided MEGAHIT contigs/GFA mapping. "
+                f"Example IDs: {examples}. Please check inputs."
+            )
+            logger.error(msg)
+            raise RuntimeError(msg)
+
     except BaseException as err:
+        if isinstance(err, RuntimeError):
+            raise
         logger.error(f"Unexpected {err}")
         logger.error(
             "Please make sure that you have provided the correct assembler type and the correct path to the binning result file in the correct format."

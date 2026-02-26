@@ -60,21 +60,50 @@ def get_initial_binning_result(
     logger.info("Obtaining the initial binning result")
 
     bins = [[] for x in range(n_bins)]
+    missing_contig_ids = []
+    max_examples = 5
 
     try:
         with open(contig_bins_file) as contig_bins:
             readCSV = csv.reader(contig_bins, delimiter=delimiter)
             for row in readCSV:
+                if not row or len(row) < 2:
+                    continue
+
+                contig_label = row[0].strip()
+                bin_name = row[1].strip()
                 start = "NODE_"
                 end = "_length_"
-                contig_num = contigs_map_rev[
-                    int(re.search("%s(.*)%s" % (start, end), row[0]).group(1))
-                ]
+                match = re.search("%s(.*)%s" % (start, end), contig_label)
+                if not match:
+                    if len(missing_contig_ids) < max_examples:
+                        missing_contig_ids.append(contig_label)
+                    continue
 
-                bin_num = bins_list.index(row[1])
+                graph_contig_num = int(match.group(1))
+                if graph_contig_num not in contigs_map_rev:
+                    if len(missing_contig_ids) < max_examples:
+                        missing_contig_ids.append(contig_label)
+                    continue
+
+                contig_num = contigs_map_rev[graph_contig_num]
+
+                bin_num = bins_list.index(bin_name)
                 bins[bin_num].append(contig_num)
 
+        if missing_contig_ids:
+            examples = ", ".join(missing_contig_ids)
+            msg = (
+                "Input mismatch: some contig IDs in the initial binning result were not found "
+                "in the provided SPAdes contigs/paths files. "
+                f"Example IDs: {examples}. Please check inputs."
+            )
+            logger.error(msg)
+            raise RuntimeError(msg)
+
     except BaseException as err:
+        if isinstance(err, RuntimeError):
+            raise
         logger.error(f"Unexpected {err}")
         logger.error(
             "Please make sure that you have provided the correct assembler type and the correct path to the binning result file in the correct format."

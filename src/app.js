@@ -31,6 +31,16 @@ function log(msg) {
   outputEl.textContent += msg + "\n";
 }
 
+function mapGraphbinError(statusText, fallbackErr) {
+  const text = String(statusText || "");
+  if (text.toLowerCase().includes("input mismatch")) {
+    return new Error(
+      "Input mismatch between initial binning results and provided assembly/contig files. Please check inputs."
+    );
+  }
+  return fallbackErr;
+}
+
 function setGraphbinStatus(msg) {
   if (!graphbinStatusEl) return;
   graphbinStatusEl.textContent = msg;
@@ -747,7 +757,7 @@ graphbin_SPAdes.run(args_ns)
           status += String(err);
         }
         setGraphbinStatus(status.trim());
-        throw err;
+        throw mapGraphbinError(status, err);
       }
 
       if (!graphbinStatusHasLog) {
@@ -802,7 +812,7 @@ graphbin_MEGAHIT.run(args_ns)
           status += String(err);
         }
         setGraphbinStatus(status.trim());
-        throw err;
+        throw mapGraphbinError(status, err);
       }
 
       if (!graphbinStatusHasLog) {
@@ -1077,7 +1087,7 @@ graphbin_SPAdes.run(args_ns)
         status += String(err);
       }
       setGraphbinStatus(status.trim());
-      throw err;
+      throw mapGraphbinError(status, err);
     }
 
     if (!graphbinStatusHasLog) {
