@@ -115,6 +115,63 @@ Then copy and paste the link shown as "Local:" in your web browser. It will look
 http://localhost:4173/graphbin-viz/
 ```
 
+## Benchmarking Different Datasets
+
+This repo includes a Playwright benchmark pipeline that records timing metrics per dataset run to CSV.
+
+### Configure datasets and run counts
+
+Edit:
+
+`tests/bench/datasets.manifest.json`
+
+Manifest format:
+
+```json
+{
+  "runs": { "cold": 1, "warm": 3 },
+  "datasets": [
+    { "name": "bundled-example", "mode": "example" },
+    {
+      "name": "my-upload-dataset",
+      "mode": "upload",
+      "graph": "/absolute/or/relative/path/to/assembly_graph.gfa",
+      "contigs": "/absolute/or/relative/path/to/contigs.fasta",
+      "paths": "/absolute/or/relative/path/to/contigs.paths",
+      "initial": "/absolute/or/relative/path/to/initial_binning.csv",
+      "delimiter": ","
+    }
+  ]
+}
+```
+
+`cold` runs start from a fresh page load; `warm` runs repeat without reloading.
+
+### Run benchmark
+
+```shell
+npm run test:e2e:bench
+```
+
+### Output
+
+Results are appended to:
+
+`tests/bench/results/benchmark-results.csv`
+
+Each row includes:
+* dataset metadata
+* phase timings (`pyodide_init`, `input_load`, `graphbin`, `visualize`, `interactive_prepare`, `interactive_render_ready`)
+* total time
+* graph size / contig count metadata
+* browser, host, commit hash, and errors (if any)
+
+Optional environment overrides:
+
+* `BENCHMARK_MANIFEST` (default: `tests/bench/datasets.manifest.json`)
+* `BENCHMARK_OUTPUT` (default: `tests/bench/results/benchmark-results.csv`)
+* `BENCHMARK_WAIT_TIMEOUT_MS` (default: `900000`)
+
 ## Acknowledgement
 
 The development of this app was motivated by concepts described in the Wasm ABABCS2025 Workshop (doi: https://doi.org/10.5281/zenodo.17743837).
