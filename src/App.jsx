@@ -212,6 +212,7 @@ export default function App() {
                 <div className="control">
                   <select id="assembler" defaultValue="spades">
                     <option value="spades">SPAdes</option>
+                    <option value="megahit">MEGAHIT</option>
                   </select>
                 </div>
               </div>
@@ -246,13 +247,14 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="form-row">
+              <div className="form-row" id="paths-row">
                 <div className="label-with-help">
                   <label htmlFor="paths">Paths file</label>
                   <details className="help" role="group">
                     <summary aria-label="Paths file help">?</summary>
                     <span className="help-tooltip" role="tooltip">
-                      The paths file of the contigs (e.g., contigs.paths from SPAdes)
+                      The paths file of the contigs (e.g., contigs.paths from
+                      SPAdes). Not required for MEGAHIT.
                     </span>
                   </details>
                 </div>

@@ -148,15 +148,6 @@ function finishBenchmarkRun(run, { status, error = null } = {}) {
   return result;
 }
 
-function logBenchmarkSummary(result) {
-  log(
-    `[Benchmark] dataset=${result.dataset} source=${result.source} status=${result.status} total_ms=${result.total_ms}`
-  );
-  log(
-    `[Benchmark] pyodide_init_ms=${result.phase_ms.pyodide_init} input_load_ms=${result.phase_ms.input_load} graphbin_ms=${result.phase_ms.graphbin} visualize_ms=${result.phase_ms.visualize} interactive_prepare_ms=${result.phase_ms.interactive_prepare} interactive_render_ready_ms=${result.phase_ms.interactive_render_ready}`
-  );
-}
-
 function waitForRenderFrame(drawFn) {
   return new Promise((resolve) => {
     requestAnimationFrame(() => {
@@ -372,6 +363,38 @@ document.getElementById("contigs").addEventListener("change", function () {
   }
 });
 
+const assemblerSelect = document.getElementById("assembler");
+const pathsInput = document.getElementById("paths");
+const pathsRow = document.getElementById("paths-row");
+const pathsLabel = document.querySelector('label[for="paths"]');
+
+function syncAssemblerInputs() {
+  const assembler = assemblerSelect ? assemblerSelect.value : "spades";
+  const isSpades = assembler === "spades";
+
+  if (pathsInput) {
+    pathsInput.disabled = !isSpades;
+    if (!isSpades) {
+      pathsInput.value = "";
+    }
+  }
+
+  if (pathsRow) {
+    pathsRow.style.opacity = "1";
+  }
+
+  if (pathsLabel) {
+    pathsLabel.textContent = isSpades
+      ? "Paths file"
+      : "Paths file";
+  }
+}
+
+if (assemblerSelect) {
+  assemblerSelect.addEventListener("change", syncAssemblerInputs);
+  syncAssemblerInputs();
+}
+
 /* =========================
    Pyodide init
    ========================= */
@@ -410,14 +433,18 @@ async function getPyodide() {
     // Fetch Python files and write them into Pyodide’s filesystem
     const files = [
       "spades_plot.py",
+      "megahit_plot.py",
       "bidictmap.py",
       "interactive_export.py",
+      "interactive_export_megahit.py",
       "graphbin/graphbin_SPAdes.py",
+      "graphbin/graphbin_MEGAHIT.py",
       "graphbin/graphbin_Func.py",
       "graphbin/labelpropagation/__init__.py",
       "graphbin/labelpropagation/labelprop.py",
       "graphbin/parsers/__init__.py",
       "graphbin/parsers/spades_parser.py",
+      "graphbin/parsers/megahit_parser.py",
     ];
     log("Loading Python files into Pyodide FS...");
     for (const f of files) {
@@ -535,6 +562,8 @@ async function runInputPlot() {
 
   const graph = document.getElementById("graph").files[0];
   const contigs = document.getElementById("contigs").files[0];
+  const assembler = document.getElementById("assembler").value;
+  const requiresPaths = assembler === "spades";
   const paths = document.getElementById("paths").files[0];
   const initial = document.getElementById("initial").files[0];
 
@@ -568,8 +597,12 @@ async function runInputPlot() {
       : GRAPHBIN_DEFAULTS.diff_threshold;
   const setShowLpLog = showLpLogValue === "true";
 
-  if (!graph || !contigs || !paths || !initial) {
-    log("Please pick all input files (graph, contigs, paths, initial).");
+  if (!graph || !contigs || !initial || (requiresPaths && !paths)) {
+    if (requiresPaths) {
+      log("Please pick all input files (graph, contigs, paths, initial).");
+    } else {
+      log("Please pick all input files (graph, contigs, initial).");
+    }
     return;
   }
 
@@ -580,7 +613,7 @@ async function runInputPlot() {
     fileSizes: {
       graph: graph.size ?? null,
       contigs: contigs.size ?? null,
-      paths: paths.size ?? null,
+      paths: requiresPaths && paths ? paths.size ?? null : null,
       initial: initial.size ?? null,
     },
   });
@@ -595,31 +628,34 @@ async function runInputPlot() {
     const inputLoadStart = nowMs();
     const graphPath = await writeUploadedFile(pyodide, graph, "/data/assembly_graph.gfa");
     const contigsPath = await writeUploadedFile(pyodide, contigs, "/data/contigs.fasta");
-    const pathsPath = await writeUploadedFile(pyodide, paths, "/data/contigs.paths");
+    const pathsPath = requiresPaths
+      ? await writeUploadedFile(pyodide, paths, "/data/contigs.paths")
+      : null;
     const initialPath = await writeUploadedFile(pyodide, initial, "/data/initial_binning.tsv");
     benchmark.phase_ms.input_load = roundMs(nowMs() - inputLoadStart);
-    const finalPath = "/out/graphbin_output.csv";
+    let finalPath = "/out/graphbin_output.csv";
 
-    const graphbinArgs = {
-      graph: graphPath,
-      contigs: contigsPath,
-      paths: pathsPath,
-      binned: initialPath,
-      output: "/out/",
-      prefix: "",
-      delimiter: setDelimiter,
-      max_iteration: setMaxIter,
-      min_bin_size: setMinBinSize,
-      diff_threshold: setDiffThreshold,
-      show_lp_log: setShowLpLog,
-    };
+    if (requiresPaths) {
+      const graphbinArgs = {
+        graph: graphPath,
+        contigs: contigsPath,
+        paths: pathsPath,
+        binned: initialPath,
+        output: "/out/",
+        prefix: "",
+        delimiter: setDelimiter,
+        max_iteration: setMaxIter,
+        min_bin_size: setMinBinSize,
+        diff_threshold: setDiffThreshold,
+        show_lp_log: setShowLpLog,
+      };
 
-    log("Running GraphBin in Pyodide... This step can take a while for large files.");
-    resetGraphbinStatus("Running GraphBin...");
+      log("Running GraphBin in Pyodide... This step can take a while for large files.");
+      resetGraphbinStatus("Running GraphBin...");
 
-    const graphbinStart = nowMs();
-    try {
-      await pyodide.runPythonAsync(`
+      const graphbinStart = nowMs();
+      try {
+        await pyodide.runPythonAsync(`
 import json
 from types import SimpleNamespace
 import graphbin_SPAdes
@@ -629,30 +665,86 @@ args_ns = SimpleNamespace(**args_dict)
 
 graphbin_SPAdes.run(args_ns)
   `);
-      benchmark.phase_ms.graphbin = roundMs(nowMs() - graphbinStart);
-    } catch (err) {
-      benchmark.phase_ms.graphbin = roundMs(nowMs() - graphbinStart);
-      let status = "GraphBin failed. ";
-      try {
-        const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
-        status += logText ? "\n" + logText : String(err);
-      } catch (e) {
-        status += String(err);
-      }
-      setGraphbinStatus(status.trim());
-      throw err;
-    }
-
-    if (!graphbinStatusHasLog) {
-      try {
-        const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
-        if (logText && logText.trim().length > 0) {
-          setGraphbinStatus(logText);
-        } else {
-          setGraphbinStatus("GraphBin finished. Log file was empty.");
+        benchmark.phase_ms.graphbin = roundMs(nowMs() - graphbinStart);
+      } catch (err) {
+        benchmark.phase_ms.graphbin = roundMs(nowMs() - graphbinStart);
+        let status = "GraphBin failed. ";
+        try {
+          const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+          status += logText ? "\n" + logText : String(err);
+        } catch (e) {
+          status += String(err);
         }
-      } catch (e) {
-        setGraphbinStatus("GraphBin finished. Log file not available.");
+        setGraphbinStatus(status.trim());
+        throw err;
+      }
+
+      if (!graphbinStatusHasLog) {
+        try {
+          const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+          if (logText && logText.trim().length > 0) {
+            setGraphbinStatus(logText);
+          } else {
+            setGraphbinStatus("GraphBin finished. Log file was empty.");
+          }
+        } catch (e) {
+          setGraphbinStatus("GraphBin finished. Log file not available.");
+        }
+      }
+    } else {
+      const graphbinArgs = {
+        graph: graphPath,
+        contigs: contigsPath,
+        binned: initialPath,
+        output: "/out/",
+        prefix: "",
+        delimiter: setDelimiter,
+        max_iteration: setMaxIter,
+        min_bin_size: setMinBinSize,
+        diff_threshold: setDiffThreshold,
+        show_lp_log: setShowLpLog,
+      };
+
+      log("Running GraphBin in Pyodide... This step can take a while for large files.");
+      resetGraphbinStatus("Running GraphBin...");
+
+      const graphbinStart = nowMs();
+      try {
+        await pyodide.runPythonAsync(`
+import json
+from types import SimpleNamespace
+import graphbin_MEGAHIT
+
+args_dict = json.loads(${JSON.stringify(JSON.stringify(graphbinArgs))})
+args_ns = SimpleNamespace(**args_dict)
+
+graphbin_MEGAHIT.run(args_ns)
+  `);
+        benchmark.phase_ms.graphbin = roundMs(nowMs() - graphbinStart);
+      } catch (err) {
+        benchmark.phase_ms.graphbin = roundMs(nowMs() - graphbinStart);
+        let status = "GraphBin failed. ";
+        try {
+          const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+          status += logText ? "\n" + logText : String(err);
+        } catch (e) {
+          status += String(err);
+        }
+        setGraphbinStatus(status.trim());
+        throw err;
+      }
+
+      if (!graphbinStatusHasLog) {
+        try {
+          const logText = readTextFromPyodide(pyodide, "/out/graphbin.log");
+          if (logText && logText.trim().length > 0) {
+            setGraphbinStatus(logText);
+          } else {
+            setGraphbinStatus("GraphBin finished. Log file was empty.");
+          }
+        } catch (e) {
+          setGraphbinStatus("GraphBin finished. Log file not available.");
+        }
       }
     }
 
@@ -661,7 +753,7 @@ graphbin_SPAdes.run(args_ns)
       final: finalPath,
       graph: graphPath,
       paths: pathsPath,
-      contigs: contigsPath, // needed for exporter (len/gc)
+      contigs: contigsPath,
       output: "/out/",
       prefix: "",
       dpi: setDpi,
@@ -677,7 +769,8 @@ graphbin_SPAdes.run(args_ns)
     log("Running GraphBin visualise in Pyodide... This step can take a while for large files. Please be patient!");
 
     const visualizeStart = nowMs();
-    await pyodide.runPythonAsync(`
+    if (requiresPaths) {
+      await pyodide.runPythonAsync(`
 import json
 from types import SimpleNamespace
 import spades_plot
@@ -689,6 +782,20 @@ args_ns = SimpleNamespace(**args_dict)
 spades_plot.run(args_ns)
 interactive_export.export(args_ns, "/out/interactive_graph.json")
   `);
+    } else {
+      await pyodide.runPythonAsync(`
+import json
+from types import SimpleNamespace
+import megahit_plot
+import interactive_export_megahit
+
+args_dict = json.loads(${JSON.stringify(JSON.stringify(args))})
+args_ns = SimpleNamespace(**args_dict)
+
+megahit_plot.run(args_ns)
+interactive_export_megahit.export(args_ns, "/out/interactive_graph.json")
+  `);
+    }
     benchmark.phase_ms.visualize = roundMs(nowMs() - visualizeStart);
 
     log("Python finished, reading plots from /out...");
@@ -732,7 +839,9 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
       initInteractiveUI();
       initSankeyUI();
       updateFlowStats();
-      benchmark.phase_ms.interactive_prepare = roundMs(nowMs() - interactivePrepareStart);
+      benchmark.phase_ms.interactive_prepare = roundMs(
+        nowMs() - interactivePrepareStart
+      );
 
       const interactiveRenderStart = nowMs();
       await waitForRenderFrame(() => {
@@ -760,7 +869,6 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
       status: benchmarkStatus,
       error: benchmark.error,
     });
-    logBenchmarkSummary(result);
     log("Done!");
   } catch (err) {
     benchmark.error = String(err);
@@ -768,7 +876,6 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
       status: "failed",
       error: benchmark.error,
     });
-    logBenchmarkSummary(result);
     throw err;
   }
 }
@@ -1019,7 +1126,6 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
       status: benchmarkStatus,
       error: benchmark.error,
     });
-    logBenchmarkSummary(result);
     log("Done (example data)!");
   } catch (err) {
     benchmark.error = String(err);
@@ -1027,7 +1133,6 @@ interactive_export.export(args_ns, "/out/interactive_graph.json")
       status: "failed",
       error: benchmark.error,
     });
-    logBenchmarkSummary(result);
     throw err;
   }
 }
