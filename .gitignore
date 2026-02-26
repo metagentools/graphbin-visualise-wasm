@@ -10,6 +10,7 @@ dist/
 # Python
 public/py/*__pycache__/
 public/py/graphbin/__pycache__/
+public/py/graphbin/parsers/__pycache__/
 public/py/graphbin/labelpropagation/__pycache__/
 
 # Testing
