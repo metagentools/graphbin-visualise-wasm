@@ -1,0 +1,39 @@
+{
+  "runs": {
+    "cold": 1,
+    "warm": 3
+  },
+  "datasets": [
+    {
+      "name": "bundled-example",
+      "mode": "example"
+    },
+    {
+      "name": "bundled-upload",
+      "mode": "upload",
+      "graph": "../../public/data/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../public/data/contigs.fasta",
+      "paths": "../../public/data/contigs.paths",
+      "initial": "../../public/data/initial_binning_res.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "10G",
+      "mode": "upload",
+      "graph": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/assembly_graph_with_scaffolds.gfa",
+      "contigs": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/contigs.fasta",
+      "paths": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/contigs.paths",
+      "initial": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "20G",
+      "mode": "upload",
+      "graph": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/assembly_graph_with_scaffolds.gfa",
+      "contigs": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/contigs.fasta",
+      "paths": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/contigs.paths",
+      "initial": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/initial_contig_bins.csv",
+      "delimiter": ","
+    }
+  ]
+}

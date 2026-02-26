@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:unit": "vitest run",
     "test:unit:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:bench": "playwright test --config=playwright.benchmark.config.js"
   },
   "dependencies": {
     "react": "^18.2.0",
