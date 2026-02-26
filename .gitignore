@@ -7,6 +7,10 @@
 node_modules/
 dist/
 
+# Python
+public/py/__pycache__/
+public/py/graphbin/__pycache__/
+
 # Testing
 test-results/
 playwright-report/
