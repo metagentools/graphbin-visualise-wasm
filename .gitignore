@@ -11,3 +11,4 @@ dist/
 test-results/
 playwright-report/
 coverage/
+tests/bench/results/*.csv
