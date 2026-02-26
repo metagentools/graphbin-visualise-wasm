@@ -238,7 +238,7 @@ export default function App() {
                   <details className="help" role="group">
                     <summary aria-label="Contigs file help">?</summary>
                     <span className="help-tooltip" role="tooltip">
-                      The contigs file (e.g., contigs.fasta from SPAdes)  (&lt; 200 MB)
+                      The contigs file (e.g., contigs.fasta from SPAdes) (&lt; 200 MB and &lt; 10,000 contigs)
                     </span>
                   </details>
                 </div>
