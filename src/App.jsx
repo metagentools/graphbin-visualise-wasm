@@ -228,7 +228,7 @@ export default function App() {
                   </details>
                 </div>
                 <div className="control">
-                  <input id="graph" type="file" />
+                  <input id="graph" type="file" accept=".gfa" />
                 </div>
               </div>
 
@@ -243,7 +243,7 @@ export default function App() {
                   </details>
                 </div>
                 <div className="control">
-                  <input id="contigs" type="file" />
+                  <input id="contigs" type="file" accept=".fasta,.fa,.fna" />
                 </div>
               </div>
 
@@ -276,7 +276,7 @@ export default function App() {
                   </details>
                 </div>
                 <div className="control">
-                  <input id="initial" type="file" />
+                  <input id="initial" type="file" accept=".csv,.tsv" />
                 </div>
               </div>
 

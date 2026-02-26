@@ -345,20 +345,91 @@ function resetInteractiveViews() {
 /* =========================
    File size checks
    ========================= */
+const MAX_CONTIGS = 10000;
+
+function countFastaContigs(text) {
+  let count = 0;
+  const lines = String(text || "").split(/\r?\n/);
+  for (const line of lines) {
+    if (line.startsWith(">")) count += 1;
+  }
+  return count;
+}
+
+async function validateContigsCount(file) {
+  const text = await file.text();
+  const contigCount = countFastaContigs(text);
+  return {
+    ok: contigCount <= MAX_CONTIGS,
+    count: contigCount,
+  };
+}
+
 document.getElementById("graph").addEventListener("change", function () {
   const file = this.files[0];
   const MAX_SIZE = 200 * 1024 * 1024; // 200MB
+  if (file && !file.name.toLowerCase().endsWith(".gfa")) {
+    alert("Please upload a valid GFA file ending with .gfa.");
+    this.value = "";
+    return;
+  }
   if (file && file.size > MAX_SIZE) {
     alert("GFA file is too large! Maximum allowed size is 200 MB.");
     this.value = "";
   }
 });
 
-document.getElementById("contigs").addEventListener("change", function () {
+document.getElementById("contigs").addEventListener("change", async function () {
   const file = this.files[0];
   const MAX_SIZE = 200 * 1024 * 1024; // 200MB
+  const ALLOWED_EXTENSIONS = [".fasta", ".fa", ".fna"];
+  delete this.dataset.contigCount;
+
+  if (
+    file &&
+    !ALLOWED_EXTENSIONS.some((ext) =>
+      file.name.toLowerCase().endsWith(ext)
+    )
+  ) {
+    alert("Please upload a contigs file ending with .fasta, .fa, or .fna.");
+    this.value = "";
+    return;
+  }
+
   if (file && file.size > MAX_SIZE) {
     alert("Contigs file is too large! Maximum allowed size is 200 MB.");
+    this.value = "";
+    return;
+  }
+
+  if (!file) return;
+
+  try {
+    const result = await validateContigsCount(file);
+    if (!result.ok) {
+      alert(
+        `Contigs file has ${result.count.toLocaleString()} contigs. Maximum allowed is ${MAX_CONTIGS.toLocaleString()}.`
+      );
+      this.value = "";
+      return;
+    }
+    this.dataset.contigCount = String(result.count);
+  } catch (e) {
+    alert("Failed to read contigs file. Please upload a valid FASTA file.");
+    this.value = "";
+  }
+});
+
+document.getElementById("initial").addEventListener("change", function () {
+  const file = this.files[0];
+  const ALLOWED_EXTENSIONS = [".csv", ".tsv"];
+  if (
+    file &&
+    !ALLOWED_EXTENSIONS.some((ext) =>
+      file.name.toLowerCase().endsWith(ext)
+    )
+  ) {
+    alert("Please upload an initial binning result file ending with .csv or .tsv.");
     this.value = "";
   }
 });
