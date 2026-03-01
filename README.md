@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/metagentools/graphbin-viz/main/GraphBin-Viz_logo_light.png#gh-light-mode-only" width="400" title="GraphBin logo" alt="GraphBin logo">
+  <img src="https://raw.githubusercontent.com/metagentools/graphbin-viz/main/GraphBin-Viz_logo_dark.png#gh-dark-mode-only" width="400" title="GraphBin-Viz logo" alt="GraphBin-Viz logo">
+</p>
+
 # GraphBin-Viz: Interactive Visual Analytics for Exploring Graph-based Metagenomic Binning
 
 ![GitHub License](https://img.shields.io/github/license/metagentools/graphbin-viz)
