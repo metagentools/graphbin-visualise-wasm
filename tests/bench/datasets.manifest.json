@@ -5,34 +5,47 @@
   },
   "datasets": [
     {
-      "name": "bundled-example",
-      "mode": "example"
+      "name": "5G",
+      "mode": "example",
+      "assembler": "spades"
     },
     {
-      "name": "bundled-upload",
+      "name": "5G",
       "mode": "upload",
-      "graph": "../../public/data/assembly_graph_with_scaffolds.gfa",
-      "contigs": "../../public/data/contigs.fasta",
-      "paths": "../../public/data/contigs.paths",
-      "initial": "../../public/data/initial_binning_res.csv",
+      "assembler": "spades",
+      "graph": "../../tests/data/5G/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/5G/contigs.fasta",
+      "paths": "../../tests/data/5G/contigs.paths",
+      "initial": "../../tests/data/5G/initial_binning_res.csv",
       "delimiter": ","
     },
     {
       "name": "10G",
       "mode": "upload",
-      "graph": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/assembly_graph_with_scaffolds.gfa",
-      "contigs": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/contigs.fasta",
-      "paths": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/contigs.paths",
-      "initial": "/Users/vijinimallawaarachchi/Documents/Data/Sim-10G/initial_contig_bins.csv",
+      "assembler": "spades",
+      "graph": "../../tests/data/10G/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/10G/contigs.fasta",
+      "paths": "../../tests/data/10G/contigs.paths",
+      "initial": "../../tests/data/10G/initial_contig_bins.csv",
       "delimiter": ","
     },
     {
       "name": "20G",
       "mode": "upload",
-      "graph": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/assembly_graph_with_scaffolds.gfa",
-      "contigs": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/contigs.fasta",
-      "paths": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/contigs.paths",
-      "initial": "/Users/vijinimallawaarachchi/Documents/Data/Sim-20G/initial_contig_bins.csv",
+      "assembler": "spades",
+      "graph": "../../tests/data/20G/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/20G/contigs.fasta",
+      "paths": "../../tests/data/20G/contigs.paths",
+      "initial": "../../tests/data/20G/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "megahit_test",
+      "mode": "upload",
+      "assembler": "megahit",
+      "graph": "../../tests/data/megahit_test/final.gfa",
+      "contigs": "../../tests/data/megahit_test/final.contigs.fa",
+      "initial": "../../tests/data/megahit_test/initial_bins.csv",
       "delimiter": ","
     }
   ]

@@ -20,6 +20,7 @@ const WAIT_TIMEOUT_MS = Number.parseInt(
 const CSV_HEADERS = [
   "timestamp",
   "dataset",
+  "assembler",
   "source",
   "run_type",
   "run_index",
@@ -105,7 +106,10 @@ function loadManifest(manifestPath) {
 function resolveDatasetFiles(dataset, manifestDir) {
   if (dataset.mode === "example") return null;
 
-  const required = ["graph", "contigs", "paths", "initial"];
+  const assembler = dataset.assembler || "spades";
+  const required = assembler === "spades"
+    ? ["graph", "contigs", "paths", "initial"]
+    : ["graph", "contigs", "initial"];
   for (const key of required) {
     if (!dataset[key]) {
       throw new Error(`Dataset "${dataset.name}" is missing required field "${key}".`);
@@ -116,12 +120,15 @@ function resolveDatasetFiles(dataset, manifestDir) {
   return {
     graph: resolvePath(dataset.graph),
     contigs: resolvePath(dataset.contigs),
-    paths: resolvePath(dataset.paths),
+    paths: dataset.paths ? resolvePath(dataset.paths) : null,
     initial: resolvePath(dataset.initial),
   };
 }
 
 async function triggerBenchmarkRun(page, dataset, files) {
+  const assembler = dataset.assembler || "spades";
+  await page.locator("#assembler").selectOption(assembler);
+
   if (dataset.mode === "example") {
     await page.locator("#example-btn").click();
     return;
@@ -129,7 +136,9 @@ async function triggerBenchmarkRun(page, dataset, files) {
 
   await page.locator("#graph").setInputFiles(files.graph);
   await page.locator("#contigs").setInputFiles(files.contigs);
-  await page.locator("#paths").setInputFiles(files.paths);
+  if (assembler === "spades" && files.paths) {
+    await page.locator("#paths").setInputFiles(files.paths);
+  }
   await page.locator("#initial").setInputFiles(files.initial);
   await page.locator("#setting-delimiter").selectOption(dataset.delimiter || ",");
   await page.locator("#run-btn").click();
@@ -158,6 +167,7 @@ function buildCsvRow(result, dataset, runType, runIndex, browserName) {
   return {
     timestamp: result.completed_at,
     dataset: dataset.name || result.dataset,
+    assembler: result.assembler || dataset.assembler || "spades",
     source: result.source,
     run_type: runType,
     run_index: runIndex,
@@ -199,7 +209,7 @@ test("benchmark datasets and write CSV", async ({ page, browserName }) => {
 
   for (const dataset of manifest.datasets) {
     const mode = dataset.mode || "upload";
-    const normalizedDataset = { ...dataset, mode };
+    const normalizedDataset = { ...dataset, mode, assembler: dataset.assembler || "spades" };
     const files = resolveDatasetFiles(normalizedDataset, manifestDir);
 
     for (let i = 0; i < totalRunsPerDataset; i += 1) {

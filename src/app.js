@@ -98,16 +98,18 @@ function publishRunningBenchmark(run) {
     status: "running",
     source: run.source,
     dataset: run.dataset,
+    assembler: run.assembler,
     started_at: run.started_at,
   };
 }
 
-function startBenchmarkRun({ source, dataset, delimiter, fileSizes }) {
+function startBenchmarkRun({ source, dataset, assembler, delimiter, fileSizes }) {
   benchmarkRunId += 1;
   const run = {
     run_id: benchmarkRunId,
     source,
     dataset,
+    assembler: assembler || "spades",
     delimiter,
     started_at: new Date().toISOString(),
     user_agent: navigator.userAgent,
@@ -135,6 +137,7 @@ function finishBenchmarkRun(run, { status, error = null } = {}) {
     run_id: run.run_id,
     source: run.source,
     dataset: run.dataset,
+    assembler: run.assembler,
     delimiter: run.delimiter,
     status: status || "success",
     started_at: run.started_at,
@@ -690,6 +693,7 @@ async function runInputPlot() {
   const benchmark = startBenchmarkRun({
     source: "upload",
     dataset: graph.name || "uploaded-dataset",
+    assembler,
     delimiter: setDelimiter,
     fileSizes: {
       graph: graph.size ?? null,
@@ -1005,6 +1009,7 @@ async function runExamplePlot() {
   const benchmark = startBenchmarkRun({
     source: "example",
     dataset: "example-data",
+    assembler: "spades",
     delimiter: setDelimiter,
     fileSizes: {
       graph: null,
