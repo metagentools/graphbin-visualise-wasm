@@ -1,7 +1,7 @@
 {
   "runs": {
     "cold": 1,
-    "warm": 3
+    "warm": 5
   },
   "datasets": [
     {
@@ -37,6 +37,26 @@
       "contigs": "../../tests/data/20G/contigs.fasta",
       "paths": "../../tests/data/20G/contigs.paths",
       "initial": "../../tests/data/20G/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "50G",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/50G/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/50G/contigs.fasta",
+      "paths": "../../tests/data/50G/contigs.paths",
+      "initial": "../../tests/data/50G/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "Sharon",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/Sharon1/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/Sharon1/contigs.fasta",
+      "paths": "../../tests/data/Sharon1/contigs.paths",
+      "initial": "../../tests/data/Sharon1/initial_contig_bins.csv",
       "delimiter": ","
     },
     {
