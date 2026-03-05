@@ -136,10 +136,11 @@ Manifest format:
 {
   "runs": { "cold": 1, "warm": 3 },
   "datasets": [
-    { "name": "bundled-example", "mode": "example" },
+    { "name": "bundled-example", "mode": "example", "assembler": "spades" },
     {
       "name": "my-upload-dataset",
       "mode": "upload",
+      "assembler": "spades",
       "graph": "/absolute/or/relative/path/to/assembly_graph.gfa",
       "contigs": "/absolute/or/relative/path/to/contigs.fasta",
       "paths": "/absolute/or/relative/path/to/contigs.paths",
@@ -151,6 +152,7 @@ Manifest format:
 ```
 
 `cold` runs start from a fresh page load; `warm` runs repeat without reloading.
+Set `assembler` to `spades` or `megahit`. For `megahit`, `paths` is optional.
 
 ### Run benchmark
 
@@ -166,6 +168,7 @@ Results are appended to:
 
 Each row includes:
 * dataset metadata
+* assembler
 * phase timings (`pyodide_init`, `input_load`, `graphbin`, `visualize`, `interactive_prepare`, `interactive_render_ready`)
 * total time
 * graph size / contig count metadata
