@@ -1,7 +1,7 @@
 {
   "runs": {
     "cold": 1,
-    "warm": 1
+    "warm": 10
   },
   "datasets": [
     {
