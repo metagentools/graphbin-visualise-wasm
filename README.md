@@ -126,11 +126,7 @@ This repo includes a Playwright benchmark pipeline that records timing metrics p
 
 ### Configure datasets and run counts
 
-Edit:
-
-`tests/bench/datasets.manifest.json`
-
-Manifest format:
+Edit `tests/bench/datasets.manifest.json` file and add your datasets.
 
 ```json
 {
@@ -152,7 +148,7 @@ Manifest format:
 ```
 
 `cold` runs start from a fresh page load; `warm` runs repeat without reloading.
-Set `assembler` to `spades` or `megahit`. For `megahit`, `paths` is optional.
+Set `assembler` to `spades` or `megahit`. For `megahit`, `paths` is not required.
 
 ### Run benchmark
 
@@ -162,9 +158,7 @@ npm run test:e2e:bench
 
 ### Output
 
-Results are appended to:
-
-`tests/bench/results/benchmark-results.csv`
+Results are appended to: `tests/bench/results/benchmark-results.csv`
 
 Each row includes:
 * dataset metadata
@@ -179,6 +173,21 @@ Optional environment overrides:
 * `BENCHMARK_MANIFEST` (default: `tests/bench/datasets.manifest.json`)
 * `BENCHMARK_OUTPUT` (default: `tests/bench/results/benchmark-results.csv`)
 * `BENCHMARK_WAIT_TIMEOUT_MS` (default: `900000`)
+
+### Plot benchmark CSV
+
+Use the included plotting script to visualize timing against `nodes`, `graph_size_bytes`, and `contigs_size_bytes`:
+
+```shell
+python3 tests/bench/plot_benchmark_results.py \
+  --input tests/bench/results/benchmark-results.csv \
+  --output-dir tests/bench/results/plots
+```
+
+Generated files:
+* `tests/bench/results/plots/run_level_total_vs_features.png`
+* `tests/bench/results/plots/phase_timings_vs_features.png`
+* `tests/bench/results/plots/dataset_medians.csv`
 
 ## Acknowledgement
 
