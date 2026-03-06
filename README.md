@@ -163,7 +163,7 @@ Results are appended to: `tests/bench/results/benchmark-results.csv`
 Each row includes:
 * dataset metadata
 * assembler
-* phase timings (`pyodide_init`, `input_load`, `graphbin`, `visualize`, `interactive_prepare`, `interactive_render_ready`)
+* phase timings (`pyodide_init`, `input_load`, `graphbin`, `visualize`, `layout`, `interactive_prepare`, `interactive_render_ready`)
 * total time
 * graph size / contig count metadata
 * browser, host, commit hash, and errors (if any)
