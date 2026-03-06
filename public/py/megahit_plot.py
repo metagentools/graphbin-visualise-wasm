@@ -8,6 +8,7 @@ import logging
 import math
 import os
 import re
+import time
 from collections import defaultdict
 
 from igraph import Graph
@@ -67,6 +68,10 @@ def write_layout_json(layout, graph, output_path, prefix):
 
     with open(f"{output_path}{prefix}layout.json", "w", encoding="utf-8") as f:
         json.dump({"coords": coords}, f)
+
+def write_layout_timing_json(layout_ms, output_path, prefix):
+    with open(f"{output_path}{prefix}layout_timing.json", "w", encoding="utf-8") as f:
+        json.dump({"layout_ms": float(layout_ms)}, f)
 
 
 def reverse_complement(seq):
@@ -371,8 +376,11 @@ def run(args):
     )
 
     colours = generate_distinct_colours(len(bins_list))
+    layout_start = time.perf_counter()
     layout = assembly_graph.layout_fruchterman_reingold()
+    layout_ms = (time.perf_counter() - layout_start) * 1000.0
     write_layout_json(layout, assembly_graph, output_path, prefix)
+    write_layout_timing_json(layout_ms, output_path, prefix)
 
     visual_style = {
         "bbox": (width, height),

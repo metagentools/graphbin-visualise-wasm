@@ -2,6 +2,7 @@ import random
 import re
 import csv
 import json
+import time
 from collections import defaultdict
 import numpy as np
 
@@ -72,6 +73,11 @@ def write_layout_json(layout, contigs_map, output_path, prefix):
     out_path = f"{output_path}{prefix}layout.json"
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump({"coords": coords}, f)
+
+def write_layout_timing_json(layout_ms, output_path, prefix):
+    out_path = f"{output_path}{prefix}layout_timing.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump({"layout_ms": float(layout_ms)}, f)
 
 
 def run(args):
@@ -339,11 +345,14 @@ def run(args):
     visual_style["edge_curved"] = False
 
     # Set the layout
+    layout_start = time.perf_counter()
     my_layout = assembly_graph.layout_fruchterman_reingold()
+    layout_ms = (time.perf_counter() - layout_start) * 1000.0
     visual_style["layout"] = my_layout
 
     # Save layout for reuse in interactive export
     write_layout_json(my_layout, contigs_map, output_path, prefix)
+    write_layout_timing_json(layout_ms, output_path, prefix)
 
     # Plot the graph
     draw_graph_with_matplotlib(

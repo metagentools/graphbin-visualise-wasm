@@ -120,6 +120,7 @@ function startBenchmarkRun({ source, dataset, assembler, delimiter, fileSizes })
       input_load: null,
       graphbin: null,
       visualize: null,
+      layout: null,
       interactive_prepare: null,
       interactive_render_ready: null,
     },
@@ -590,6 +591,16 @@ function readTextFromPyodide(pyodide, path) {
   return pyodide.FS.readFile(path, { encoding: "utf8" });
 }
 
+function readLayoutTimingFromPyodide(pyodide, path = "/out/layout_timing.json") {
+  try {
+    const data = readJsonFromPyodide(pyodide, path);
+    const layoutMs = Number(data?.layout_ms);
+    return Number.isFinite(layoutMs) ? roundMs(layoutMs) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 function getFileExtension(path) {
   const match = String(path || "").match(/\.([a-z0-9]+)$/i);
   return match ? match[1].toLowerCase() : "";
@@ -882,6 +893,7 @@ interactive_export_megahit.export(args_ns, "/out/interactive_graph.json")
   `);
     }
     benchmark.phase_ms.visualize = roundMs(nowMs() - visualizeStart);
+    benchmark.phase_ms.layout = readLayoutTimingFromPyodide(pyodide);
 
     log("Python finished, reading plots from /out...");
 
@@ -1142,6 +1154,7 @@ spades_plot.run(args_ns)
 interactive_export.export(args_ns, "/out/interactive_graph.json")
   `);
     benchmark.phase_ms.visualize = roundMs(nowMs() - visualizeStart);
+    benchmark.phase_ms.layout = readLayoutTimingFromPyodide(pyodide);
 
     log("Python finished, reading example plots from /out...");
 

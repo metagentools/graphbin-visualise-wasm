@@ -14,6 +14,7 @@ NUMERIC_COLUMNS = [
     "input_load_ms",
     "graphbin_ms",
     "visualize_ms",
+    "layout_ms",
     "interactive_prepare_ms",
     "interactive_render_ready_ms",
     "nodes",
@@ -28,10 +29,11 @@ X_SPECS = [
 ]
 
 Y_SPECS = [
-    ("total_ms", "Total time (ms)"),
     ("input_load_ms", "Input load time (ms)"),
     ("graphbin_ms", "GraphBin time (ms)"),
+    ("layout_ms", "Layout time (ms)"),
     ("visualize_ms", "Visualize time (ms)"),
+    ("total_ms", "Total time (ms)"),
 ]
 
 
@@ -161,7 +163,7 @@ def summarize_phase_with_error(rows):
 
 
 def plot_run_level_total(rows, output_path, annotate=True):
-    fig, axes = plt.subplots(1, len(X_SPECS), figsize=(15, 5), constrained_layout=True)
+    fig, axes = plt.subplots(1, len(X_SPECS), figsize=(12, 4), constrained_layout=True)
     assemblers = sorted({row["assembler"] for row in rows})
     colors = {asm: plt.get_cmap("tab10")(i % 10) for i, asm in enumerate(assemblers)}
 
@@ -211,7 +213,7 @@ def plot_run_level_total(rows, output_path, annotate=True):
         all_labels.extend(labels)
     handles, labels = _dedup_legend_items(all_handles, all_labels)
     if handles:
-        axes[-1].legend(handles, labels, loc="upper right", title="Assembler", frameon=True)
+        axes[-1].legend(handles, labels, loc="lower right", title="Assembler", frameon=True)
     fig.suptitle("Dataset-level total benchmark results")
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
@@ -221,7 +223,7 @@ def plot_phase_grid_with_error(rows, output_path, annotate=True):
     fig, axes = plt.subplots(
         len(Y_SPECS),
         len(X_SPECS),
-        figsize=(15, 12),
+        figsize=(12, 15),
         constrained_layout=True,
     )
     assemblers = sorted({r["assembler"] for r in rows})
@@ -275,11 +277,11 @@ def plot_phase_grid_with_error(rows, output_path, annotate=True):
         axes[-1][-1].legend(
             handles,
             labels,
-            loc="upper right",
+            loc="lower right",
             title="Assembler",
             frameon=True,
         )
-    fig.suptitle("Phase timings vs features")
+    fig.suptitle("Phase timings")
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
 
