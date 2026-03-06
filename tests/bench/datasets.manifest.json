@@ -1,52 +1,132 @@
 {
   "runs": {
     "cold": 1,
-    "warm": 5
+    "warm": 1
   },
   "datasets": [
     {
-      "name": "5G",
+      "name": "5G_MiSeq",
       "mode": "example",
       "assembler": "spades"
     },
     {
-      "name": "5G",
+      "name": "5G_MiSeq",
       "mode": "upload",
       "assembler": "spades",
-      "graph": "../../tests/data/5G/assembly_graph_with_scaffolds.gfa",
-      "contigs": "../../tests/data/5G/contigs.fasta",
-      "paths": "../../tests/data/5G/contigs.paths",
-      "initial": "../../tests/data/5G/initial_binning_res.csv",
+      "graph": "../../tests/data/5G_MiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/5G_MiSeq/contigs.fasta",
+      "paths": "../../tests/data/5G_MiSeq/contigs.paths",
+      "initial": "../../tests/data/5G_MiSeq/initial_contig_bins.csv",
       "delimiter": ","
     },
     {
-      "name": "10G",
+      "name": "5G_HiSeq",
       "mode": "upload",
       "assembler": "spades",
-      "graph": "../../tests/data/10G/assembly_graph_with_scaffolds.gfa",
-      "contigs": "../../tests/data/10G/contigs.fasta",
-      "paths": "../../tests/data/10G/contigs.paths",
-      "initial": "../../tests/data/10G/initial_contig_bins.csv",
+      "graph": "../../tests/data/5G_HiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/5G_HiSeq/contigs.fasta",
+      "paths": "../../tests/data/5G_HiSeq/contigs.paths",
+      "initial": "../../tests/data/5G_HiSeq/initial_contig_bins.csv",
       "delimiter": ","
     },
     {
-      "name": "20G",
+      "name": "5G_NovaSeq",
       "mode": "upload",
       "assembler": "spades",
-      "graph": "../../tests/data/20G/assembly_graph_with_scaffolds.gfa",
-      "contigs": "../../tests/data/20G/contigs.fasta",
-      "paths": "../../tests/data/20G/contigs.paths",
-      "initial": "../../tests/data/20G/initial_contig_bins.csv",
+      "graph": "../../tests/data/5G_NovaSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/5G_NovaSeq/contigs.fasta",
+      "paths": "../../tests/data/5G_NovaSeq/contigs.paths",
+      "initial": "../../tests/data/5G_NovaSeq/initial_contig_bins.csv",
       "delimiter": ","
     },
     {
-      "name": "50G",
+      "name": "10G_MiSeq",
       "mode": "upload",
       "assembler": "spades",
-      "graph": "../../tests/data/50G/assembly_graph_with_scaffolds.gfa",
-      "contigs": "../../tests/data/50G/contigs.fasta",
-      "paths": "../../tests/data/50G/contigs.paths",
-      "initial": "../../tests/data/50G/initial_contig_bins.csv",
+      "graph": "../../tests/data/10G_MiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/10G_MiSeq/contigs.fasta",
+      "paths": "../../tests/data/10G_MiSeq/contigs.paths",
+      "initial": "../../tests/data/10G_MiSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "10G_HiSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/10G_HiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/10G_HiSeq/contigs.fasta",
+      "paths": "../../tests/data/10G_HiSeq/contigs.paths",
+      "initial": "../../tests/data/10G_HiSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "10G_NovaSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/10G_NovaSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/10G_NovaSeq/contigs.fasta",
+      "paths": "../../tests/data/10G_NovaSeq/contigs.paths",
+      "initial": "../../tests/data/10G_NovaSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "20G_MiSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/20G_MiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/20G_MiSeq/contigs.fasta",
+      "paths": "../../tests/data/20G_MiSeq/contigs.paths",
+      "initial": "../../tests/data/20G_MiSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "20G_HiSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/20G_HiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/20G_HiSeq/contigs.fasta",
+      "paths": "../../tests/data/20G_HiSeq/contigs.paths",
+      "initial": "../../tests/data/20G_HiSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "20G_NovaSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/20G_NovaSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/20G_NovaSeq/contigs.fasta",
+      "paths": "../../tests/data/20G_NovaSeq/contigs.paths",
+      "initial": "../../tests/data/20G_NovaSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "50G_MiSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/50G_MiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/50G_MiSeq/contigs.fasta",
+      "paths": "../../tests/data/50G_MiSeq/contigs.paths",
+      "initial": "../../tests/data/50G_MiSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "50G_HiSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/50G_HiSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/50G_HiSeq/contigs.fasta",
+      "paths": "../../tests/data/50G_HiSeq/contigs.paths",
+      "initial": "../../tests/data/50G_HiSeq/initial_contig_bins.csv",
+      "delimiter": ","
+    },
+    {
+      "name": "50G_NovaSeq",
+      "mode": "upload",
+      "assembler": "spades",
+      "graph": "../../tests/data/50G_NovaSeq/assembly_graph_with_scaffolds.gfa",
+      "contigs": "../../tests/data/50G_NovaSeq/contigs.fasta",
+      "paths": "../../tests/data/50G_NovaSeq/contigs.paths",
+      "initial": "../../tests/data/50G_NovaSeq/initial_contig_bins.csv",
       "delimiter": ","
     },
     {

@@ -22,7 +22,7 @@ NUMERIC_COLUMNS = [
 ]
 
 X_SPECS = [
-    ("nodes", "Nodes", lambda v: v),
+    ("nodes", "Number of contigs", lambda v: v),
     ("graph_size_bytes", "Graph size (MB)", lambda v: v / (1024 * 1024)),
     ("contigs_size_bytes", "Contigs size (MB)", lambda v: v / (1024 * 1024)),
 ]
@@ -160,7 +160,7 @@ def summarize_phase_with_error(rows):
     return summarized
 
 
-def plot_run_level_total(rows, output_path):
+def plot_run_level_total(rows, output_path, annotate=True):
     fig, axes = plt.subplots(1, len(X_SPECS), figsize=(15, 5), constrained_layout=True)
     assemblers = sorted({row["assembler"] for row in rows})
     colors = {asm: plt.get_cmap("tab10")(i % 10) for i, asm in enumerate(assemblers)}
@@ -192,9 +192,11 @@ def plot_run_level_total(rows, output_path):
                     color=colors[assembler],
                     label=assembler,
                 )
-                ax.annotate(
-                    dataset_row["dataset"], (x_median, y_median), fontsize=8, alpha=0.85
-                )
+
+                if annotate:
+                    ax.annotate(
+                        dataset_row["dataset"], (x_median, y_median), fontsize=8, alpha=0.85
+                    )
 
         ax.set_title(f"Total time vs {x_label}")
         ax.set_xlabel(x_label)
@@ -327,7 +329,7 @@ def main():
     median_csv = os.path.join(args.output_dir, "dataset_medians.csv")
 
     run_level_summary = summarize_metric_with_error(valid_rows, "total_ms")
-    plot_run_level_total(run_level_summary, run_level_plot)
+    plot_run_level_total(run_level_summary, run_level_plot, annotate=not args.no_annotations)
     plot_phase_grid_with_error(phase_rows, phase_plot, annotate=not args.no_annotations)
     write_aggregated_csv(median_rows, median_csv)
 
