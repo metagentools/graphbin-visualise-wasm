@@ -189,6 +189,8 @@ Generated files:
 * `tests/bench/results/plots/phase_timings_vs_features.png`
 * `tests/bench/results/plots/dataset_medians.csv`
 
+![Phase timings vs features](tests/bench/results/plots/phase_timings_vs_features.png)
+
 ## Acknowledgement
 
 The development of this app was motivated by concepts described in the Wasm ABABCS2025 Workshop (doi: https://doi.org/10.5281/zenodo.17743837).
