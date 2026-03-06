@@ -189,7 +189,7 @@ Generated files:
 * `tests/bench/results/plots/phase_timings_vs_features.png`
 * `tests/bench/results/plots/dataset_medians.csv`
 
-![Phase timings vs features](tests/bench/results/plots/phase_timings_vs_features.png)
+![Phase timings vs features](tests/bench/results/phase_timings_vs_features.png)
 
 ## Acknowledgement
 
