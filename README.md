@@ -83,7 +83,7 @@ This view provides a high-level summary of bin refinement behavior, complementin
 
 * Built-in test data for instant demonstration
 * Client-side file handling - your data never leaves your computer
-* Pure static site — works on GitHub Pages
+* Pure static site - works on GitHub Pages
 
 
 ## Technologies Used
