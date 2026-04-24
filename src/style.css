@@ -3,6 +3,8 @@
 /* Base layout */
 :root{
   color-scheme: light;
+  --brand-blue-rgb: 0, 127, 255;
+  --brand-red-rgb: 255, 0, 0;
   --font-body: "Sora", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   --font-display: "Space Grotesk", system-ui, sans-serif;
@@ -17,10 +19,10 @@
   --shadow: 0 26px 60px rgba(15, 23, 42, 0.12);
   --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.08);
   --radius: 18px;
-  --focus: rgba(14, 165, 233, 0.3);
-  --accent: #0ea5e9;
-  --accent-2: #22c55e;
-  --accent-3: #f59e0b;
+  --focus: rgba(var(--brand-blue-rgb), 0.28);
+  --accent: rgb(var(--brand-blue-rgb));
+  --accent-2: rgb(var(--brand-red-rgb));
+  --accent-3: #b60028;
   --input-bg: #ffffff;
   --output-bg: #f8fafc;
   --output-text: #0f172a;
@@ -46,10 +48,10 @@
   --border-strong: #253246;
   --shadow: 0 30px 80px rgba(2, 6, 23, 0.55);
   --shadow-sm: 0 12px 28px rgba(0, 0, 0, 0.45);
-  --focus: rgba(56, 189, 248, 0.35);
-  --accent: #38bdf8;
-  --accent-2: #a3e635;
-  --accent-3: #fbbf24;
+  --focus: rgba(var(--brand-blue-rgb), 0.34);
+  --accent: #4ca3ff;
+  --accent-2: #ff4d5a;
+  --accent-3: #ff6b77;
   --input-bg: #0b1322;
   --output-bg: #0b1220;
   --output-text: #e2e8f0;
@@ -67,8 +69,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(1000px 600px at 10% -10%, rgba(14,165,233,0.18), transparent 60%),
-              radial-gradient(900px 600px at 110% 0%, rgba(34,197,94,0.14), transparent 55%),
+  background: radial-gradient(1000px 600px at 10% -10%, rgba(var(--brand-blue-rgb), 0.18), transparent 60%),
+              radial-gradient(900px 600px at 110% 0%, rgba(var(--brand-red-rgb), 0.12), transparent 55%),
               var(--bg);
   font-family: var(--font-body);
   color: var(--text);
@@ -81,8 +83,8 @@ body {
 }
 
 :root[data-theme="dark"] body{
-  background: radial-gradient(1000px 600px at 10% -10%, rgba(56,189,248,0.16), transparent 60%),
-              radial-gradient(900px 600px at 110% 0%, rgba(163,230,53,0.12), transparent 55%),
+  background: radial-gradient(1000px 600px at 10% -10%, rgba(var(--brand-blue-rgb), 0.2), transparent 60%),
+              radial-gradient(900px 600px at 110% 0%, rgba(var(--brand-red-rgb), 0.16), transparent 55%),
               var(--bg);
 }
 
@@ -110,7 +112,7 @@ body {
 
 .app-footer a:hover{
   color: var(--accent);
-  border-color: rgba(14, 165, 233, 0.6);
+  border-color: rgba(var(--brand-blue-rgb), 0.6);
 }
 
 .app-footer a:focus-visible{
@@ -261,7 +263,7 @@ body {
   width: 100%;
   padding: 18px 20px 20px;
   border-radius: 18px;
-  background: linear-gradient(140deg, rgba(14, 165, 233, 0.12), rgba(34, 197, 94, 0.08) 55%, rgba(245, 158, 11, 0.06));
+  background: linear-gradient(140deg, rgba(var(--brand-blue-rgb), 0.14), rgba(255, 255, 255, 0.9) 56%, rgba(var(--brand-red-rgb), 0.08));
   border: 1px solid var(--border-strong);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -275,7 +277,7 @@ body {
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.22), transparent 62%);
+  background: radial-gradient(circle, rgba(var(--brand-red-rgb), 0.2), transparent 62%);
   pointer-events: none;
 }
 
@@ -289,8 +291,8 @@ body {
 }
 
 :root[data-theme="dark"] .intro-card{
-  background: linear-gradient(140deg, rgba(56, 189, 248, 0.12), rgba(163, 230, 53, 0.08) 55%, rgba(251, 191, 36, 0.08));
-  border-color: rgba(56, 189, 248, 0.2);
+  background: linear-gradient(140deg, rgba(var(--brand-blue-rgb), 0.22), rgba(11, 18, 32, 0.94) 56%, rgba(var(--brand-red-rgb), 0.16));
+  border-color: rgba(var(--brand-blue-rgb), 0.22);
 }
 
 :root[data-theme="dark"] .intro-card::after{
@@ -422,13 +424,13 @@ body {
 .subtitle a{
   color: var(--text);
   text-decoration: none;
-  border-bottom: 1px solid rgba(14, 165, 233, 0.4);
+  border-bottom: 1px solid rgba(var(--brand-blue-rgb), 0.42);
   transition: color 0.18s ease, border-color 0.18s ease;
 }
 
 .subtitle a:hover{
   color: var(--accent);
-  border-color: rgba(14, 165, 233, 0.8);
+  border-color: rgba(var(--brand-blue-rgb), 0.82);
 }
 
 .subtitle a:focus-visible{
@@ -497,10 +499,10 @@ body {
 }
 
 .tab-btn.active{
-  background: linear-gradient(135deg, rgba(14,165,233,0.14), rgba(34,197,94,0.16));
+  background: linear-gradient(135deg, rgba(var(--brand-blue-rgb), 0.14), rgba(var(--brand-red-rgb), 0.14));
   color: var(--text);
-  border-color: rgba(14,165,233,0.5);
-  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.18);
+  border-color: rgba(var(--brand-blue-rgb), 0.5);
+  box-shadow: 0 12px 24px rgba(var(--brand-blue-rgb), 0.18);
 }
 
 .tab-btn:focus-visible{
@@ -840,7 +842,7 @@ select:focus{
 .btn.primary {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   color: #ffffff;
-  box-shadow: 0 14px 28px rgba(14, 165, 233, 0.25);
+  box-shadow: 0 14px 28px rgba(var(--brand-blue-rgb), 0.24);
   border-color: transparent;
 }
 
@@ -1174,7 +1176,7 @@ select:focus{
 
 .bin-legend-swatch.legend-misbinned{
   background: transparent;
-  border: 2px dashed #ef4444;
+  border: 2px dashed rgb(var(--brand-red-rgb));
   width: 18px;
   height: 18px;
   border-radius: 5px;

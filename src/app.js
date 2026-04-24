@@ -24,6 +24,9 @@ const GRAPHBIN_DEFAULTS = {
   min_bin_size: 5,
 };
 
+const BRAND_BLUE = "#007fff";
+const BRAND_RED = "#ff0000";
+
 // Initial placeholder when page loads
 outputEl.textContent = "(logs will appear here)\n\n";
 
@@ -1425,7 +1428,7 @@ function renderBinLegend() {
 
   // Add unbinned
   el.appendChild(makeLegendRow("(unbinned)", "#d3d3d3"));
-  el.appendChild(makeLegendRow("Likely misbinned", "#ef4444", "misbinned"));
+  el.appendChild(makeLegendRow("Likely misbinned", BRAND_RED, "misbinned"));
   el.appendChild(makeLegendRow("Ambiguous", "#111827", "ambiguous"));
 
   // bins in sorted order for consistency
@@ -2304,7 +2307,7 @@ function render() {
 
     if (isLocked) {
       ctx.lineWidth = 3 / t.k;
-      ctx.strokeStyle = "#2563eb";
+      ctx.strokeStyle = BRAND_BLUE;
       ctx.stroke();
     } else if (isHover) {
       ctx.lineWidth = 2 / t.k;
@@ -2318,7 +2321,7 @@ function render() {
       ctx.arc(n.x, n.y, r + (2 / t.k), 0, Math.PI * 2);
       ctx.lineWidth = 3 / t.k;
       ctx.setLineDash([2 / t.k, 2 / t.k]);
-      ctx.strokeStyle = "#ef4444";
+      ctx.strokeStyle = BRAND_RED;
       ctx.stroke();
       ctx.restore();
     }
