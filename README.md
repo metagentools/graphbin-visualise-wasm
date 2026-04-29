@@ -195,6 +195,8 @@ Generated files:
 
 The development of this app was motivated by concepts described in the Wasm ABABCS2025 Workshop (doi: https://doi.org/10.5281/zenodo.17743837).
 
+ChatGPT (OpenAI) was used as a development aid during front-end implementation for UI design iteration, component structuring, styling suggestions, and debugging support. All generated code and recommendations were reviewed, modified as needed, and validated by the project authors before integration.
+
 ## Citation
 
 If you use this in your work, please cite GraphBin and GraphBin-Tk (full citations below).
