@@ -193,6 +193,8 @@ Generated files:
 
 ## Acknowledgement
 
+This work is dedicated to the memory of the late [Dr Yu Lin](https://xuehansheng.github.io/Yu_CV_2022.pdf) ([The Computational Genomics Group](https://cgg-anu.github.io/) at The Australian National University) whose guidance and support were instrumental in shaping the work around GraphBin. His wisdom and mentorship will be deeply missed.
+
 The development of this app was motivated by concepts described in the Wasm ABABCS2025 Workshop (doi: https://doi.org/10.5281/zenodo.17743837).
 
 ChatGPT (OpenAI) was used as a development aid during front-end implementation for UI design iteration, component structuring, styling suggestions, and debugging support. All generated code and recommendations were reviewed, modified as needed, and validated by the project authors before integration.
